@@ -1,0 +1,5 @@
+requests
+pymorphy2
+pymorphy2-dicts
+DAWG-Python
+bs4
