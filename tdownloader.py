@@ -1,6 +1,5 @@
 #Требуется рефакторинг
 #Требуется оптимизация кода скачивания
-#Требуется научить requests логиниться
 
 import io, os, time, requests, requests_cache, threading
 import helpers

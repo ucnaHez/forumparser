@@ -23,7 +23,7 @@ class MessageParser: #splits message into words and feeds a wordparser
         clearWords = []
         for word in words:
             word = word.strip()
-            if len(word) <= 0:
+            if len(word) <= 1:
                 continue
             if word in replaceRules:
                 clearWords.extend(replaceRules[word])
@@ -87,15 +87,31 @@ class WordCounter:
         for word in self.frequentWordsCounter.most_common():
             f.write(str(word[1]) + ":" + word[0] + "\n")
         f.close()
-                
+
+class CitationCounter:
+    def __init__(self):
+        self.nicknameCounter = Counter()
+
+    def feed(self, word):
+        self.nicknameCounter[word] += 1
+
+    def finalize(self):
+        return
+
+    def saveData(self):
+        print("Writing to: " + helpers._citationCountDataLoc)
+        f = io.open(helpers._citationCountDataLoc, 'w+', encoding="UTF-8")
+        for word in self.nicknameCounter.most_common():
+            f.write(str(word[1]) + ":" + word[0] + "\n")
+        f.close()
         
 def parseMessages():
     if not os.path.exists(helpers._messagesDataLoc):
         print(helpers._messagesDataLoc + " is not exists!")
         return
 
-    wordparser = WordCounter()
-    messageParser = MessageParser(wordparser)
+    wordParser = WordCounter()
+    messageParser = MessageParser(wordParser)
     parsedLines = 0
 
     print("Reading from: " + helpers._messagesDataLoc)
@@ -109,4 +125,15 @@ def parseMessages():
 
     messageParser.finalize()
 
+    wordParser = CitationCounter()
+    print("Reading from: " + helpers._quotesDataLoc)
+    f = io.open(helpers._quotesDataLoc, 'r', encoding="UTF-8")
+    for text in f:
+        t = text.split('||')
+        wordParser.feed(t[0])
+    f.close()
+
+    wordParser.finalize()
+    wordParser.saveData()
+    
     print("Completed in " + helpers.timeSince(_startTime) + "!")

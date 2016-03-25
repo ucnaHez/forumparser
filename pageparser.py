@@ -13,8 +13,10 @@ import helpers
 def isPlainText(c):
     return isinstance(c, NavigableString) and not isinstance(c, Comment)
 
-def findAllTextInBlock(block, exceptClasses = []):
+def findAllTextInBlock(block, exceptClasses = [], currentDepth = 1, maxDepth = 10):
     msgs = []
+    if currentDepth >= maxDepth:
+        return msgs
     for child in block.children:
         if isPlainText(child):
             text = child.string.replace("\n", " ")
@@ -29,7 +31,7 @@ def findAllTextInBlock(block, exceptClasses = []):
                 t = []
             merge = [i for i in t if i in exceptClasses]
             if len(merge) <= 0:
-                msgs.extend(findAllTextInBlock(child, exceptClasses))
+                msgs.extend(findAllTextInBlock(child, exceptClasses, currentDepth + 1))
     return msgs #messages with only quotes
 
 def findData(soup):
@@ -55,9 +57,13 @@ def findData(soup):
                 continue
             for t in range(len(p)):
                 nick = ' '.join(findAllTextInBlock(p[t]))
-                i = min(nick.find('('), nick.find(u'ска')) #сказал
-                if i > 0:
-                    nick = nick[:i - 1]
+                i = nick.find('(')
+                i2 = nick.find(':')
+                if i > 0 or i2 > 0:
+                    if i < 0:  
+                        nick = nick[:i2 - 7]
+                    else:
+                        nick = nick[:i - 1]
 
                 text = ' '.join(findAllTextInBlock(d[t]))
                 if text.isspace() or nick.isspace():

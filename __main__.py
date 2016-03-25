@@ -12,7 +12,7 @@ def main():
         
     #tdownloader.download_cache()
     pageparser.parseData()
-    #messageparser.parseMessages()
+    messageparser.parseMessages()
     
 
 if __name__ == '__main__':
