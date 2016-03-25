@@ -6,6 +6,7 @@ _processedDataLoc =     "processedData"
 _wordFrequencyLemmsLoc = "__lemma2.txt"
 
 _messagesDataLoc =      _processedDataLoc + "\\messages.txt"
+_quotesDataLoc =        _processedDataLoc + "\\quotes.txt"
 _wordsDataLoc =         _processedDataLoc + "\\words.txt"
 _unknownWordsDataLoc =  _processedDataLoc + "\\unknownWords.txt"
 _frequentWordsDataLoc = _processedDataLoc + "\\frequentWords.txt"

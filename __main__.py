@@ -11,8 +11,8 @@ def main():
         helpers.loadPrivateKey()
         
     #tdownloader.download_cache()
-    #pageparser.parseData()
-    messageparser.parseMessages()
+    pageparser.parseData()
+    #messageparser.parseMessages()
     
 
 if __name__ == '__main__':

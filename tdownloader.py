@@ -2,8 +2,10 @@
 #Требуется оптимизация кода скачивания
 #Требуется научить requests логиниться
 
-import io, os, time, requests, threading
+import io, os, time, requests, requests_cache, threading
 import helpers
+
+requests_cache.install_cache('__forum.ss13.ru')
 
 _topicURL = "http://forum.ss13.ru/index.php?showtopic="
 _topicSubpageDelimiter = "&st="

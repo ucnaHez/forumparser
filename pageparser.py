@@ -1,3 +1,8 @@
+#OH GOD DO SOMETHING WITH IT!
+#IT'S SOOOO BAD!!
+
+#TODO: remove "сказал:"
+
 from html.parser import HTMLParser
 from bs4 import BeautifulSoup
 from bs4 import NavigableString
@@ -5,38 +10,68 @@ from bs4 import Comment
 import io, os
 import helpers
 
-_saveDir = "processedData"
-_rawDir = "rawData"
-_saveFile = "messages.txt"
+def isPlainText(c):
+    return isinstance(c, NavigableString) and not isinstance(c, Comment)
 
-def getPlainMessages(soup):
+def findAllTextInBlock(block, exceptClasses = []):
+    msgs = []
+    for child in block.children:
+        if isPlainText(child):
+            text = child.string.replace("\n", " ")
+            text = text.strip()
+            if not text.isspace() and len(text) > 0:
+                msgs.append(text)
+        elif isinstance(child, Comment):
+            continue
+        else:
+            t = child.get('class')
+            if t is None:
+                t = []
+            merge = [i for i in t if i in exceptClasses]
+            if len(merge) <= 0:
+                msgs.extend(findAllTextInBlock(child, exceptClasses))
+    return msgs #messages with only quotes
+
+def findData(soup):
     messages = []
+    quotes = []
     for div in soup.find_all('div'):
         cls = div.get('class')
-        if cls == None:
+        if cls is None:
             continue
         if 'entry-content' in cls:
-            for child in div.children:
-                if not isinstance(child, NavigableString) or isinstance(child, Comment):
-                    continue
-                text = child.string.replace("\n", " ")
-                text = text.strip()
-                if text.isspace() or len(text) <= 0:
-                    continue
-                messages.append(text)
+            #messages
+            msg = findAllTextInBlock(div, ['citation', 'quote'])
+            messages.extend(msg)                    
 
-    return messages
+            #citations
+            p = div.find_all(class_='citation')
+            d = div.find_all(class_='quote')
+            if p is None or d is None:
+                continue
+            if len(p) != len(d):
+                print("SYNTAX ERROR")
+            if len(p) <= 0:
+                continue
+            for t in range(len(p)):
+                nick = ' '.join(findAllTextInBlock(p[t]))
+                i = min(nick.find('('), nick.find(u'ска')) #сказал
+                if i > 0:
+                    nick = nick[:i - 1]
 
-def saveMessages(msgs):
-    f = io.open(_saveDir + "\\" + _saveFile, 'a+', encoding="UTF-8")
-    for msg in msgs:
-        f.write((msg + "\n"))
-    f.close()
+                text = ' '.join(findAllTextInBlock(d[t]))
+                if text.isspace() or nick.isspace():
+                    print("Data not found: " + str(nick) + " - " + str(text))
+                else:
+                    quotes.append((nick, text))
+                    
+                            
+    return (messages, quotes)
 
 def parseData():   
     if os.path.exists(helpers._messagesDataLoc):
         os.remove(helpers._messagesDataLoc)
-        print("Old " + _saveFile + " is removed.")
+        print("Old " + helpers._messagesDataLoc + " is removed.")
     
     allFiles = []
     if not os.path.exists(helpers._rawDataLoc):
@@ -51,13 +86,27 @@ def parseData():
     
     print("Found " + str(filesTotal) + " files total.")
 
-    
+
+    fm = io.open(helpers._messagesDataLoc, 'w+',encoding="UTF-8")
+    fq = io.open(helpers._quotesDataLoc, 'w+',encoding="UTF-8")
     for file in allFiles:
         f = io.open(helpers._rawDataLoc + "\\" + file, encoding="UTF-8")
+        
         text = f.read()
         soup = BeautifulSoup(text, 'html.parser')
-        msgs = getPlainMessages(soup)
-        saveMessages(msgs)
+        data = findData(soup)
+
+        for msg in data[0]:
+            fm.write(msg + "\n")
+        for quote in data[1]:
+            fq.write(quote[0] + "||" + quote[1] + "\n")
+            
         f.close()
+
+        fm.flush()
+        fq.flush()
+        
         filesParsed += 1
-        print("File " + file + " is parsed. [" + str(filesParsed) + "/" + str(filesTotal) + "]")           
+        print("File " + file + " is parsed. [" + str(filesParsed) + "/" + str(filesTotal) + "]")
+    fm.close()
+    fq.close()
