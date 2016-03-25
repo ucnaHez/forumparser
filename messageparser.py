@@ -48,9 +48,11 @@ class WordCounter:
             self.wordsCounter[word] += 1
         else:
             p = morph.parse(word)
+            # S:
+            n = p[0].normal_form.replace('ё', 'е')
             if 'UNKN' in p[0].tag:
-                self.unknownWordsCounter[p[0].normal_form] += 1
-            self.wordsCounter[p[0].normal_form] += 1
+                self.unknownWordsCounter[n] += 1
+            self.wordsCounter[n] += 1
 
     def finalize(self):
         frequencyTable = Counter()
@@ -58,30 +60,31 @@ class WordCounter:
         print("Reading from: " + helpers._wordFrequencyLemmsLoc)
         f = io.open(helpers._wordFrequencyLemmsLoc, 'r', encoding="UTF-8")
         for text in f:
-            lemma = text.split(' ')
-            frequencyTable[lemma[2]] = float(lemma[1])
+            lemma = text.strip().split(' ')
+            frequencyTable[lemma[1]] = float(lemma[0])
         f.close()
-
+        
         for word in self.wordsCounter.most_common():
             frequency = max(frequencyTable[word[0]], 1)
-            self.frequentWordsCounter[word[0]] = word[1] * 100000 / frequency
+            self.frequentWordsCounter[word[0]] = round(word[1] * 100000 / frequency)
+            #self.frequentWordsCounter[word[0]] = frequency
         
     def saveData(self):
         print("Writing to: " + helpers._wordsDataLoc)
         f = io.open(helpers._wordsDataLoc, 'w+', encoding="UTF-8")
-        for word in wordparser.wordsCounter.most_common():
+        for word in self.wordsCounter.most_common():
             f.write(str(word[1]) + ":" + word[0] + "\n")
         f.close()
 
         print("Writing to: " + helpers._unknownWordsDataLoc)
         f = io.open(helpers._unknownWordsDataLoc, 'w+', encoding="UTF-8")
-        for word in wordparser.unknownWordsCounter.most_common():
+        for word in self.unknownWordsCounter.most_common():
             f.write(str(word[1]) + ":" + word[0] + "\n")
         f.close()
 
         print("Writing to: " + helpers._frequentWordsDataLoc)
         f = io.open(helpers._frequentWordsDataLoc, 'w+', encoding="UTF-8")
-        for word in wordparser.frequentWordsCounter.most_common():
+        for word in self.frequentWordsCounter.most_common():
             f.write(str(word[1]) + ":" + word[0] + "\n")
         f.close()
                 

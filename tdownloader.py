@@ -12,7 +12,7 @@ _startTime = time.time()
 
 def makeRequest(address):
     try:
-        r = requests.get(address)
+        r = requests.get(address, cookies=helpers._cookies)
     except BaseException as s:
         print(address + " - " + str(s))
         return None
@@ -31,11 +31,11 @@ def saveTopic(request, id, page):
 
 def reportCompletion(id, pages):
     timePassed = helpers.timeSince(_startTime)
-    print("[" + timePassed + "] Access to topic " + str(id - 1) + " successed. Total " + str(pages) + " pages are downloaded.\n", end="")
+    print("[" + timePassed + "] Access to topic " + str(id) + " successed. Total " + str(pages - 1) + " pages are downloaded.\n", end="")
 
 def reportFailure(id, pages):
     timePassed = helpers.timeSince(_startTime)
-    print("[" + timePassed + "] Access to " + str(id - 1) + " failed on page " + str(pages) + ".\n", end="")
+    print("[" + timePassed + "] Access to " + str(id) + " failed on page " + str(pages) + ".\n", end="")
 
 def reportCustom(text):
     timePassed = helpers.timeSince(_startTime)

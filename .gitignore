@@ -1,3 +1,4 @@
 rawData/*
 processedData/*
 __pycache__/*
+__private_key.txt

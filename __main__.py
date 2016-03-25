@@ -7,7 +7,9 @@ def main():
         os.mkdir(helpers._rawDataLoc)
     if not os.path.exists(helpers._processedDataLoc):
         os.mkdir(helpers._processedDataLoc)
-    
+    if os.path.exists(helpers._cookiesDataLoc): 
+        helpers.loadPrivateKey()
+        
     #tdownloader.download_cache()
     #pageparser.parseData()
     messageparser.parseMessages()
