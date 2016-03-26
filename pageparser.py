@@ -1,13 +1,11 @@
 #OH GOD DO SOMETHING WITH IT!
 #IT'S SOOOO BAD!!
 
-#TODO: remove "сказал:"
-
 from html.parser import HTMLParser
 from bs4 import BeautifulSoup
 from bs4 import NavigableString
 from bs4 import Comment
-import io, os
+import io, os, time
 import helpers
 
 def isPlainText(c):
@@ -32,29 +30,33 @@ def findAllTextInBlock(block, exceptClasses = [], currentDepth = 1, maxDepth = 1
             merge = [i for i in t if i in exceptClasses]
             if len(merge) <= 0:
                 msgs.extend(findAllTextInBlock(child, exceptClasses, currentDepth + 1))
-    return msgs #messages with only quotes
+    return ''.join(msgs)
 
-def findData(soup):
+def getDataFromPosts(soup):
     messages = []
     quotes = []
-    for div in soup.find_all('div'):
-        cls = div.get('class')
-        if cls is None:
-            continue
-        if 'entry-content' in cls:
-            #messages
-            msg = findAllTextInBlock(div, ['citation', 'quote'])
-            messages.extend(msg)                    
+    for postbody in soup.find_all(class_="post_body"):
+        #messages
+        post = postbody.find(class_="entry-content")
+        msg = findAllTextInBlock(post, ['citation', 'quote'])
 
-            #citations
-            p = div.find_all(class_='citation')
-            d = div.find_all(class_='quote')
-            if p is None or d is None:
-                continue
-            if len(p) != len(d):
-                print("SYNTAX ERROR")
-            if len(p) <= 0:
-                continue
+        #reputation
+        repblock = postbody.find(class_="rep_bar")
+        rep = findAllTextInBlock(repblock).replace(' ', '')
+
+        #time
+        infoblock = postbody.find(class_="posted_info")
+        timeblock = infoblock.find(class_="published")
+        timestr = timeblock.get('title')
+        #ptime = time.strptime(timestr, "%Y-%m-%dT%H:%M:%S+00:00")
+        
+        messages.append((rep, timestr, msg))
+        
+        #quotes
+        p = post.find_all(class_='citation')
+        d = post.find_all(class_='quote')
+        
+        if not p is None and not d is None:
             for t in range(len(p)):
                 nick = ' '.join(findAllTextInBlock(p[t]))
                 i = nick.find('(')
@@ -65,13 +67,14 @@ def findData(soup):
                     else:
                         nick = nick[:i - 1]
 
-                text = ' '.join(findAllTextInBlock(d[t]))
-                if text.isspace() or nick.isspace():
-                    print("Data not found: " + str(nick) + " - " + str(text))
-                else:
-                    quotes.append((nick, text))
-                    
-                            
+                    text = ' '.join(findAllTextInBlock(d[t]))
+                    if text.isspace() or nick.isspace():
+                        print("Data not found: " + str(nick) + " - " + str(text))
+                    else:
+                        quotes.append((nick, text))
+        
+            
+
     return (messages, quotes)
 
 def parseData():   
@@ -92,7 +95,6 @@ def parseData():
     
     print("Found " + str(filesTotal) + " files total.")
 
-
     fm = io.open(helpers._messagesDataLoc, 'w+',encoding="UTF-8")
     fq = io.open(helpers._quotesDataLoc, 'w+',encoding="UTF-8")
     for file in allFiles:
@@ -100,12 +102,13 @@ def parseData():
         
         text = f.read()
         soup = BeautifulSoup(text, 'html.parser')
-        data = findData(soup)
+
+        data = getDataFromPosts(soup)
 
         for msg in data[0]:
-            fm.write(msg + "\n")
+            fm.write("{3}||{0}||{1}||{2}\n".format(msg[0], msg[1], msg[2], file))
         for quote in data[1]:
-            fq.write(quote[0] + "||" + quote[1] + "\n")
+            fq.write("{0}||{1}\n".format(quote[0], quote[1]))
             
         f.close()
 
@@ -114,5 +117,8 @@ def parseData():
         
         filesParsed += 1
         print("File " + file + " is parsed. [" + str(filesParsed) + "/" + str(filesTotal) + "]")
+
     fm.close()
     fq.close()
+
+parseData()
