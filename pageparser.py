@@ -35,13 +35,25 @@ def findAllTextInBlock(block, exceptClasses = [], currentDepth = 1, maxDepth = 1
 def getDataFromPosts(soup):
     messages = []
     quotes = []
-    for postbody in soup.find_all(class_="post_body"):
+    for postblock in soup.find_all(class_="post_block"):
+        postbody = postblock.find(class_="post_body")
+
+        #name
+        authorinfo = postblock.find(class_="user_details")
+        authorname = findAllTextInBlock(authorinfo.span)
+        
+        #id
+        postid = postblock.get('id')[8:]
+        
         #messages
         post = postbody.find(class_="entry-content")
         msg = findAllTextInBlock(post, ['citation', 'quote'])
 
         #reputation
         repblock = postbody.find(class_="rep_bar")
+        if repblock is None:
+            rep = 0
+            print("No reputation error in {0}".format(postblock))
         rep = findAllTextInBlock(repblock).replace(' ', '')
 
         #time
@@ -50,7 +62,7 @@ def getDataFromPosts(soup):
         timestr = timeblock.get('title')
         #ptime = time.strptime(timestr, "%Y-%m-%dT%H:%M:%S+00:00")
         
-        messages.append((rep, timestr, msg))
+        messages.append((postid, authorname, rep, timestr, msg))
         
         #quotes
         p = post.find_all(class_='citation')
@@ -58,7 +70,7 @@ def getDataFromPosts(soup):
         
         if not p is None and not d is None:
             for t in range(len(p)):
-                nick = ' '.join(findAllTextInBlock(p[t]))
+                nick = findAllTextInBlock(p[t])
                 i = nick.find('(')
                 i2 = nick.find(':')
                 if i > 0 or i2 > 0:
@@ -67,14 +79,12 @@ def getDataFromPosts(soup):
                     else:
                         nick = nick[:i - 1]
 
-                    text = ' '.join(findAllTextInBlock(d[t]))
+                    text = findAllTextInBlock(d[t])
                     if text.isspace() or nick.isspace():
                         print("Data not found: " + str(nick) + " - " + str(text))
                     else:
                         quotes.append((nick, text))
-        
-            
-
+                        
     return (messages, quotes)
 
 def parseData():   
@@ -92,6 +102,7 @@ def parseData():
 
     filesParsed = 0   
     filesTotal = len(allFiles)
+    soupTimeTotal = .0
     
     print("Found " + str(filesTotal) + " files total.")
 
@@ -100,13 +111,13 @@ def parseData():
     for file in allFiles:
         f = io.open(helpers._rawDataLoc + "\\" + file, encoding="UTF-8")
         
-        text = f.read()
+        text = f.read().replace('\n','')
+        
         soup = BeautifulSoup(text, 'html.parser')
-
         data = getDataFromPosts(soup)
-
+        
         for msg in data[0]:
-            fm.write("{3}||{0}||{1}||{2}\n".format(msg[0], msg[1], msg[2], file))
+            fm.write("{0}||{1}||{2}||{3}||{4}\n".format(msg[0], msg[1], msg[2], msg[3], msg[4]))
         for quote in data[1]:
             fq.write("{0}||{1}\n".format(quote[0], quote[1]))
             
@@ -120,5 +131,4 @@ def parseData():
 
     fm.close()
     fq.close()
-
-parseData()
+    print("Completed!")    

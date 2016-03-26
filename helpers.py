@@ -11,11 +11,12 @@ _wordsDataLoc =         _processedDataLoc + "\\words.txt"
 _unknownWordsDataLoc =  _processedDataLoc + "\\unknownWords.txt"
 _frequentWordsDataLoc = _processedDataLoc + "\\frequentWords.txt"
 _citationCountDataLoc = _processedDataLoc + "\\citationCount.txt"
+_ratedContentDataLoc =  _processedDataLoc + "\\ratedContent.txt"
 
 _cookiesDataLoc = "__private_key.txt"
 
 _threadCount = 3
-_topicCount = 15000
+_topicCount = 100
 
 _errorText = "Извините, мы не можем найти это!"
 _notExistsText = """<p class='ipsType_sectiontitle'>

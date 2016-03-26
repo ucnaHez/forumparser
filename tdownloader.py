@@ -6,6 +6,9 @@ import helpers
 
 requests_cache.install_cache('__forum.ss13.ru')
 
+s = requests.session()
+s.keep_alive = False
+
 _topicURL = "http://forum.ss13.ru/index.php?showtopic="
 _topicSubpageDelimiter = "&st="
 _topicSubpageCountMod = 20
