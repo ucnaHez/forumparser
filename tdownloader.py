@@ -9,9 +9,6 @@ requests_cache.install_cache('__forum.ss13.ru')
 s = requests.session()
 s.keep_alive = False
 
-_topicURL = "http://forum.ss13.ru/index.php?showtopic="
-_topicSubpageDelimiter = "&st="
-_topicSubpageCountMod = 20
 _startTime = time.time()
 
 def makeRequest(address):
@@ -23,13 +20,12 @@ def makeRequest(address):
     return r
 
 def getTopic(id, page):
-    return makeRequest(buildPageReference(id, page))
+    return makeRequest(helpers.getPageURL(id, page))
 
 def saveTopic(request, id, page):   
-    if not os.path.exists(helpers._rawDataLoc):
-        os.mkdir(helpers._rawDataLoc)
-    #print("Writing to: " + helpers._rawDataLoc)
-    f = io.open(helpers._rawDataLoc + "\\" + str(id) + "." + str(page) + ".html", "w", encoding="UTF-8")
+    if not os.path.exists(helpers._rawTopicsDataLoc):
+        os.mkdir(helpers._rawTopicsDataLoc)
+    f = io.open(helpers._rawTopicsDataLoc + "\\" + helpers.getPageFilename(id, page), "w+", encoding="UTF-8")
     f.write(request.text)
     f.close()
 
@@ -47,10 +43,7 @@ def reportCustom(text):
 
 def reportCacheFixing(id):
     print("Cached data of topic " + id + " is fixed.")
-
-def buildPageReference(id, page):
-    return _topicURL + str(id) + _topicSubpageDelimiter + str((page - 1) * _topicSubpageCountMod)
-
+    
 def getNextTopic():
     global currentTopicID
     global maxTopicCount

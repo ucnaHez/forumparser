@@ -9,10 +9,16 @@ def main():
         os.mkdir(helpers._processedDataLoc)
     if os.path.exists(helpers._cookiesDataLoc): 
         helpers.loadPrivateKey()
-        
+    else:
+        proceed = input("Private key is not found. Only threads that are available anonymously will be downloaded. Proceed? [Y/N]")
+        if proceed.lower() != "y":
+            print("Shutting down")
+            return
+    
     tdownloader.download_cache()
     pageparser.parseData()
     messageparser.parseMessages()
+
     
 
 if __name__ == '__main__':

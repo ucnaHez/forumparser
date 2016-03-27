@@ -20,9 +20,10 @@ class WordCounter:
         f = io.open(helpers._messagesDataLoc, 'r', encoding='UTF-8')
         for text in f:
             msg = text.split('||')
-            words = self.pattern.sub(' ', msg[4]).split()
+            text = msg[6]
+            words = self.pattern.sub(' ', text).split()
             if words is None:
-                words = [msg[4]]
+                words = [text]
         
             clearWords = []
             for word in words:
@@ -49,8 +50,15 @@ class WordCounter:
     def finalize(self):
         frequencyTable = Counter()
         
-        print("Reading from: " + helpers._wordFrequencyLemmsLoc)
-        f = io.open(helpers._wordFrequencyLemmsLoc, 'r', encoding="UTF-8")
+        print("Reading from: " + helpers._wordFrequencyRuLoc)
+        f = io.open(helpers._wordFrequencyRuLoc, 'r', encoding="UTF-8")
+        for text in f:
+            lemma = text.strip().split(' ')
+            frequencyTable[lemma[1]] = float(lemma[0])
+        f.close()
+
+        print("Reading from: " + helpers._wordFrequencyEnLoc)
+        f = io.open(helpers._wordFrequencyEnLoc, 'r', encoding="UTF-8")
         for text in f:
             lemma = text.strip().split(' ')
             frequencyTable[lemma[1]] = float(lemma[0])
@@ -89,7 +97,7 @@ class CitationCounter:
         f = io.open(helpers._quotesDataLoc, 'r', encoding="UTF-8")
         for text in f:
             msg = text.split('||')
-            self.nicknameCounter[msg[0]] += 1
+            self.nicknameCounter[msg[3]] += 1
         f.close()
 
     def finalize(self):
@@ -104,28 +112,28 @@ class CitationCounter:
 
 class MostLeastVotedContent:
     def __init__(self):
-        self.name = "Most and least voted content"
+        self.name = "Most and least rated content"
         self.mostVoted = []
         self.leastVoted = []
         
 
-        for i in range(100):
-            self.mostVoted.append((1, "No sender", "No ID"))
-            self.leastVoted.append((-1, "No sender", "No ID"))
+        for i in range(50):
+            self.mostVoted.append((1, "No sender", "No URL"))
+            self.leastVoted.append((-1, "No sender", "No URL"))
         
     def doWork(self):
         print("Reading from: " + helpers._messagesDataLoc)
         f = io.open(helpers._messagesDataLoc, 'r', encoding="UTF-8")
         for text in f:
             msg = text.split('||')
-            msgRep = int(msg[2])
+            msgRep = int(msg[4])
             
             if msgRep > 0:
                 for entry in self.mostVoted:
                     if entry[0] >= msgRep:
                         continue
                     i = self.mostVoted.index(entry)
-                    self.mostVoted.insert(i, (msgRep, msg[1], msg[0]))
+                    self.mostVoted.insert(i, (msgRep, msg[3], helpers.getPageURL(msg[0], msg[1], msg[2])))
                     self.mostVoted.pop()
                     break
                 
@@ -134,7 +142,7 @@ class MostLeastVotedContent:
                     if entry[0] <= msgRep:
                         continue
                     i = self.leastVoted.index(entry)
-                    self.leastVoted.insert(i, (msgRep, msg[1], msg[0]))
+                    self.leastVoted.insert(i, (msgRep, msg[3], helpers.getPageURL(msg[0], msg[1], msg[2])))
                     self.leastVoted.pop()
                     break
         f.close()
@@ -151,44 +159,68 @@ class MostLeastVotedContent:
         for entry in self.leastVoted:
             f.write('{0}:{1} - {2}\n'.format(entry[0], entry[1], entry[2]))
         f.close()
+
+class TopicStartersCounter:
+    def __init__(self):
+        self.name = "Topic starters"
+        self.starterCounter = Counter()
+
+    def doWork(self):
+        lastTopicID = '0'
         
-def parseMessages():
-    if not os.path.exists(helpers._messagesDataLoc):
-        print(helpers._messagesDataLoc + " is not exists!")
+        print("Reading from: " + helpers._messagesDataLoc)
+        f = io.open(helpers._messagesDataLoc, 'r', encoding="UTF-8")
+        for text in f:
+            msg = text.split('||')
+            if lastTopicID != msg[0]:
+                self.starterCounter[msg[3]] += 1
+                lastTopicID = msg[0]
+        f.close()
+
+    def finalize(self):
+        self.starterCounter['Гость__*'] = -1
+
+    def saveData(self):
+        print("Writing to: " + helpers._topicStartersDataLoc)
+        f = io.open(helpers._topicStartersDataLoc, 'w+', encoding="UTF-8")
+        for word in self.starterCounter.most_common():
+            f.write(str(word[1]) + ":" + word[0] + "\n")
+        f.close()
+
+#needs for other parsers
+class PublicMessagesCounter:
+    def __init__(self):
+        self.name = "Public messages"
+        self.msgauthors = Counter()
+
+    def doWork(self):
+        print("Reading from: " + helpers._messagesDataLoc)
+        f = io.open(helpers._messagesDataLoc, 'r', encoding="UTF-8")
+        for text in f:
+            msg = text.split('||')
+            self.msgauthors[msg[3]] += 1
+        f.close()
+
+    def finalize(self):
         return
 
-    #wordParser = WordCounter()
-    #messageParser = MessageParser(wordParser)
-    #parsedLines = 0
+    def saveData(self):
+        print("Writing to: " + helpers._msgsCountDataLoc)
+        f = io.open(helpers._msgsCountDataLoc, 'w+', encoding="UTF-8")
+        for word in self.msgauthors.most_common():
+            f.write(str(word[1]) + ":" + word[0] + "\n")
+        f.close()
+    
 
-    #print("Reading from: " + helpers._messagesDataLoc)
-    #f = io.open(helpers._messagesDataLoc, 'r', encoding="UTF-8")
-    #for text in f:
-    #    message = text.split('||')
-    #    messageParser.feed(message)
-    #    parsedLines += 1
-    #    if parsedLines % 100 == 0:
-    #        print("Parsed " + str(parsedLines) + " lines")
-    #f.close()
-
-    #messageParser.finalize()
-
-    #wordParser = CitationCounter()
-    #print("Reading from: " + helpers._quotesDataLoc)
-    #f = io.open(helpers._quotesDataLoc, 'r', encoding="UTF-8")
-    #for text in f:
-    #    t = text.split('||')
-    #    wordParser.feed(t[0])
-    #f.close()
-
-    #wordParser.finalize()
-    #wordParser.saveData()
-
-    #new code
+def parseMessages():   
     analyzers = []
     analyzers.append(MostLeastVotedContent())
+    analyzers.append(TopicStartersCounter())
     analyzers.append(CitationCounter())
-    analyzers.append(WordCounter())
+    analyzers.append(PublicMessagesCounter())
+    #currently disabled due to long runtime
+    #analyzers.append(WordCounter())
+    
 
     for analyzer in analyzers:
         moduleStartTime = time.time()
@@ -211,3 +243,4 @@ def parseMessages():
             print('{0} module is failed on save stage. Error message: {1}'.format(analyzer.name, str(s)))
             continue
         print('-Module {0} finished work in {1} seconds.'.format(analyzer.name, str(time.time() - moduleStartTime)))    
+        print('-----')

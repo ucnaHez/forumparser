@@ -1,5 +1,8 @@
 #OH GOD DO SOMETHING WITH IT!
 #IT'S SOOOO BAD!!
+#-Done
+#Fix this rep bug!
+#-It caused by bug in bs4. It's reads corrupted block not until the end but until not opened closing tag.
 
 from html.parser import HTMLParser
 from bs4 import BeautifulSoup
@@ -87,7 +90,7 @@ def getDataFromPosts(soup, fileName):
                     if text.isspace() or nick.isspace():
                         print("Data not found: " + str(nick) + " - " + str(text))
                     else:
-                        quotes.append((nick, text))
+                        quotes.append((postid, nick, text))
                         
     return (messages, quotes)
 
@@ -97,10 +100,10 @@ def parseData():
         print("Old " + helpers._messagesDataLoc + " is removed.")
     
     allFiles = []
-    if not os.path.exists(helpers._rawDataLoc):
+    if not os.path.exists(helpers._rawTopicsDataLoc):
         print(helpers._rawDataLoc + " is not found!")
         return False
-    for file in os.listdir(helpers._rawDataLoc):
+    for file in os.listdir(helpers._rawTopicsDataLoc):
         if file.endswith(".html"):
             allFiles.append(file)
 
@@ -113,23 +116,28 @@ def parseData():
     fm = io.open(helpers._messagesDataLoc, 'w+',encoding="UTF-8")
     fq = io.open(helpers._quotesDataLoc, 'w+',encoding="UTF-8")
     for file in allFiles:
-        f = io.open(helpers._rawDataLoc + "\\" + file, encoding="UTF-8")
+        f = io.open(helpers._rawTopicsDataLoc + "\\" + file, encoding="UTF-8")
+
         
-        text = f.read().replace('\n','')
+        text = f.read().replace('||','')
         
         soup = BeautifulSoup(text, 'html.parser')
         data = getDataFromPosts(soup, file)
-        
+
+        topicInfo = file.split('.')
+                
         for msg in data[0]:
-            fm.write("{0}||{1}||{2}||{3}||{4}\n".format(msg[0], msg[1], msg[2], msg[3], msg[4]))
+            #0)topic number, 1)page number, 2)post id, 3)author name, 4)reputation, 5)post data, 6)message
+            fm.write("{0}||{1}||{2}||{3}||{4}||{5}||{6}\n".format(topicInfo[0], topicInfo[1], msg[0], msg[1], msg[2], msg[3], msg[4]))
         for quote in data[1]:
-            fq.write("{0}||{1}\n".format(quote[0], quote[1]))
+            #0)topic nubmer, 1)page number, 2)post id, 3)citated author name, 4)citation
+            fq.write("{0}||{1}||{2}||{3}||{4}\n".format(topicInfo[0], topicInfo[1], quote[0], quote[1], quote[2]))
             
         f.close()
 
         fm.flush()
         fq.flush()
-        
+
         filesParsed += 1
         print("File " + file + " is parsed. [" + str(filesParsed) + "/" + str(filesTotal) + "]")
 
