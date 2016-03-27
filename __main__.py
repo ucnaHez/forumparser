@@ -10,7 +10,7 @@ def main():
     if os.path.exists(helpers._cookiesDataLoc): 
         helpers.loadPrivateKey()
         
-    #tdownloader.download_cache()
+    tdownloader.download_cache()
     pageparser.parseData()
     messageparser.parseMessages()
     

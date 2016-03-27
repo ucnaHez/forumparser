@@ -109,7 +109,7 @@ class MostLeastVotedContent:
         self.leastVoted = []
         
 
-        for i in range(10):
+        for i in range(100):
             self.mostVoted.append((1, "No sender", "No ID"))
             self.leastVoted.append((-1, "No sender", "No ID"))
         

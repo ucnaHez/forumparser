@@ -8,6 +8,8 @@ from bs4 import Comment
 import io, os, time
 import helpers
 
+errorOutput = io.open('error.txt', 'w+', encoding='UTF-8')
+
 def isPlainText(c):
     return isinstance(c, NavigableString) and not isinstance(c, Comment)
 
@@ -32,7 +34,7 @@ def findAllTextInBlock(block, exceptClasses = [], currentDepth = 1, maxDepth = 1
                 msgs.extend(findAllTextInBlock(child, exceptClasses, currentDepth + 1))
     return ''.join(msgs)
 
-def getDataFromPosts(soup):
+def getDataFromPosts(soup, fileName):
     messages = []
     quotes = []
     for postblock in soup.find_all(class_="post_block"):
@@ -53,8 +55,10 @@ def getDataFromPosts(soup):
         repblock = postbody.find(class_="rep_bar")
         if repblock is None:
             rep = 0
-            print("No reputation error in {0}".format(postblock))
-        rep = findAllTextInBlock(repblock).replace(' ', '')
+            errorOutput.write("No reputation error in {0}! Message ID: {1}\n".format(fileName, postid))
+            errorOutput.flush()
+        else:
+            rep = findAllTextInBlock(repblock).replace(' ', '')
 
         #time
         infoblock = postbody.find(class_="posted_info")
@@ -114,7 +118,7 @@ def parseData():
         text = f.read().replace('\n','')
         
         soup = BeautifulSoup(text, 'html.parser')
-        data = getDataFromPosts(soup)
+        data = getDataFromPosts(soup, file)
         
         for msg in data[0]:
             fm.write("{0}||{1}||{2}||{3}||{4}\n".format(msg[0], msg[1], msg[2], msg[3], msg[4]))
