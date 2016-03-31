@@ -22,6 +22,7 @@ _cookiesDataLoc = "__private_key.txt"
 
 _threadCount = 3
 _topicCount = 50
+_usersCount = 143 # :3
 
 _errorText = "Извините, мы не можем найти это!"
 _notExistsText = """<p class='ipsType_sectiontitle'>
@@ -67,5 +68,11 @@ def getPageURL(topicID, page = None, entry = None):
         else:
             return 'http://forum.ss13.ru/index.php?showtopic={0}&st={1}#entry{2}'.format(topicID, (int(page) - 1) * 20, entry)
 
+def getUserpageURL(userID):
+    return 'http://forum.ss13.ru/index.php?showuser={0}'.format(userID)
+
 def getPageFilename(topicID, page):
     return '{0:06d}.{1:06d}.html'.format(topicID, page)
+
+def getUserpageFilename(userID):
+    return '{0:06d}.html'.format(userID)
