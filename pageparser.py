@@ -94,10 +94,27 @@ def getDataFromPosts(soup, fileName):
                         
     return (messages, quotes)
 
-def parseData():   
-    if os.path.exists(helpers._messagesDataLoc):
-        os.remove(helpers._messagesDataLoc)
-        print("Old " + helpers._messagesDataLoc + " is removed.")
+def getDataFromUserpages(soup, fileName):
+    data = []
+    #for listblock in soup.find_all(class_="ipsList_data"):
+    print(len(soup.find_all(class_="ipsList_data")))
+    print("USER PARSER IS NOT COMPLETED")
+
+def parsePages():
+    #this code looks so badly
+    if os.path.exists(helpers._processedDataLoc):
+        if os.path.exists(helpers._messagesDataLoc):
+            os.remove(helpers._messagesDataLoc)
+            print("Old " + helpers._messagesDataLoc + " is removed.")
+        if os.path.exists(helpers._quotesDataLoc):
+            os.remove(helpers._quotesDataLoc)
+            print("Old " + helpers._quotesDataLoc + " is removed.")
+    else:
+        os.mkdir(helpers._processedDataLoc)
+    
+    os.mkdir(helpers._messagesDataLoc)
+    os.mkdir(helpers._quotesDataLoc)
+
     
     allFiles = []
     if not os.path.exists(helpers._rawTopicsDataLoc):
@@ -109,15 +126,15 @@ def parseData():
 
     filesParsed = 0   
     filesTotal = len(allFiles)
-    soupTimeTotal = .0
     
     print("Found " + str(filesTotal) + " files total.")
 
-    fm = io.open(helpers._messagesDataLoc, 'w+',encoding="UTF-8")
-    fq = io.open(helpers._quotesDataLoc, 'w+',encoding="UTF-8")
     for file in allFiles:
-        f = io.open(helpers._rawTopicsDataLoc + "\\" + file, encoding="UTF-8")
-
+        sname = file[:-5]
+        
+        f = io.open('{0}\\{1}'.format(helpers._rawTopicsDataLoc, file), encoding="UTF-8")
+        fm = io.open('{0}\\{1}.txt'.format(helpers._messagesDataLoc, sname), 'w+',encoding="UTF-8")
+        fq = io.open('{0}\\{1}.txt'.format(helpers._quotesDataLoc, sname), 'w+',encoding="UTF-8")
         
         text = f.read().replace('||','')
         
@@ -134,13 +151,68 @@ def parseData():
             fq.write("{0}||{1}||{2}||{3}||{4}\n".format(topicInfo[0], topicInfo[1], quote[0], quote[1], quote[2]))
             
         f.close()
-
-        fm.flush()
-        fq.flush()
+        fm.close()
+        fq.close()
 
         filesParsed += 1
         print("File " + file + " is parsed. [" + str(filesParsed) + "/" + str(filesTotal) + "]")
 
+    print("Finalizing...")
+    fm = io.open(helpers._allMessagesDataLoc, 'w+', encoding='UTF-8')
+    for file in os.listdir(helpers._messagesDataLoc):
+        if not file.endswith(".txt"):
+            continue
+        f = io.open('{0}\\{1}'.format(helpers._messagesDataLoc, file), encoding='UTF-8')
+        for line in f:
+            fm.write(line)
     fm.close()
+    fq = io.open(helpers._allQuotesDataLoc, 'w+', encoding='UTF-8')
+    for file in os.listdir(helpers._allQuotesDataLoc):
+        if not file.endswith(".txt"):
+            continue
+        f = io.open('{0}\\{1}'.format(helpers._allQuotesDataLoc, file), encoding='UTF-8')
+        for line in f:
+            fq.write(line)
     fq.close()
-    print("Completed!")    
+    print("Completed!")
+
+def ParseUserpages():
+    #this code looks badly too
+    if os.path.exists(helpers._processedDataLoc):
+        if os.path.exists(helpers._allUserdataDataLoc):
+            os.remove(helpers._allUserdataDataLoc)
+            print("Old " + helpers._allUserdataDataLoc + " is removed.")
+    else:
+        os.mkdir(helpers._processedDataLoc)
+
+    allFiles = []
+    if not os.path.exists(helpers._rawUserpagesDataLoc):
+        print(helpers._rawUserpagesDataLoc + " is not found!")
+        return False
+    for file in os.listdir(helpers._rawUserpagesDataLoc):
+        if file.endswith(".html"):
+            allFiles.append(file)
+
+    filesParsed = 0   
+    filesTotal = len(allFiles)
+
+    print("Found " + str(filesTotal) + " files total.")
+
+    fp = io.open(helpers._allUserdataDataLoc, 'w+',encoding="UTF-8")
+    for file in allFiles:
+        sname = file[:-4]
+        
+        f = io.open('{0}\\{1}'.format(helpers._rawUserpagesDataLoc, file), encoding="UTF-8")
+
+        text = f.read().replace('||','')
+        soup = BeautifulSoup(text, 'html.parser')
+
+        getDataFromUserpages(soup, file)
+         
+        f.close()
+        fp.flush()
+        
+        filesParsed += 1
+        print("File " + file + " is parsed. [" + str(filesParsed) + "/" + str(filesTotal) + "]")
+    fp.close()
+    print("Completed!")

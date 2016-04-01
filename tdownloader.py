@@ -69,15 +69,18 @@ def getUserpagesAsync(userpagesToDownload):
     while len(userpagesToDownload) > 0:
         dnext = userpagesToDownload.pop()
         
-        if os.path.exists('{0}\\{1}'.format(helpers._rawUserPageDataLoc, helpers.getUserpageFilename(dnext))):
+        if os.path.exists('{0}\\{1}'.format(helpers._rawUserpagesDataLoc, helpers.getUserpageFilename(dnext))):
             print("{0} is already exists!\n".format(helpers.getUserpageFilename(dnext)), end='')
             continue
 
         page = makeRequest(helpers.getUserpageURL(dnext))
 
-        if not os.path.exists(helpers._rawUserPageDataLoc):
-            os.mkdir(helpers._rawUserPageDataLoc)
-        f = io.open('{0}\\{1}'.format(helpers._rawUserPageDataLoc, helpers.getUserpageFilename(dnext)), "w+", encoding="UTF-8")
+        if helpers.isErrorPage(page.text):
+            continue
+        
+        if not os.path.exists(helpers._rawUserpagesDataLoc):
+            os.mkdir(helpers._rawUserpagesDataLoc)
+        f = io.open('{0}\\{1}'.format(helpers._rawUserpagesDataLoc, helpers.getUserpageFilename(dnext)), "w+", encoding="UTF-8")
         f.write(page.text)
         f.close()
 
