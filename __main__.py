@@ -16,7 +16,7 @@ def main():
             return
     
     tdownloader.downloadUserpages()
-    tdownloader.downloadPages()
+    #tdownloader.downloadPages()
     #pageparser.parseData()
     #messageparser.parseMessages()
 

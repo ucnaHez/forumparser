@@ -94,27 +94,26 @@ def getDataFromPosts(soup, fileName):
                         
     return (messages, quotes)
 
-def getDataFromUserpages(soup, fileName):
+def getDataFromUserpage(soup, fileName):
     data = []
-    #for listblock in soup.find_all(class_="ipsList_data"):
-    print(len(soup.find_all(class_="ipsList_data")))
-    print("USER PARSER IS NOT COMPLETED")
+    nickblock = soup.find(class_="nickname")
+    nick = findAllTextInBlock(nickblock)
+    
+    statblock = soup.find(class_="ipsList_data")
+    rows = statblock.find_all(class_="row_data")
+    group =         findAllTextInBlock(rows[0])
+    msgsCount =     findAllTextInBlock(rows[1])
+    watchedTimes =  findAllTextInBlock(rows[2])
+    
+    return (nick, group, msgsCount, watchedTimes)
 
 def parsePages():
-    #this code looks so badly
-    if os.path.exists(helpers._processedDataLoc):
-        if os.path.exists(helpers._messagesDataLoc):
-            os.remove(helpers._messagesDataLoc)
-            print("Old " + helpers._messagesDataLoc + " is removed.")
-        if os.path.exists(helpers._quotesDataLoc):
-            os.remove(helpers._quotesDataLoc)
-            print("Old " + helpers._quotesDataLoc + " is removed.")
-    else:
-        os.mkdir(helpers._processedDataLoc)
-    
-    os.mkdir(helpers._messagesDataLoc)
-    os.mkdir(helpers._quotesDataLoc)
-
+    if not os.path.exists(helpers._processedDataLoc):
+        os.mkdir(helpers._processedDataLoc, mode=666)
+    if not os.path.exists(helpers._messagesDataLoc):
+        os.mkdir(helpers._messagesDataLoc, mode=666)
+    if not os.path.exists(helpers._quotesDataLoc):
+        os.mkdir(helpers._quotesDataLoc, mode=666)
     
     allFiles = []
     if not os.path.exists(helpers._rawTopicsDataLoc):
@@ -155,7 +154,7 @@ def parsePages():
         fq.close()
 
         filesParsed += 1
-        print("File " + file + " is parsed. [" + str(filesParsed) + "/" + str(filesTotal) + "]")
+        print("File " + file + " is parsed. [" + str(filesParsed) + "/" + str(filesTotal) + "]\r")
 
     print("Finalizing...")
     fm = io.open(helpers._allMessagesDataLoc, 'w+', encoding='UTF-8')
@@ -167,7 +166,7 @@ def parsePages():
             fm.write(line)
     fm.close()
     fq = io.open(helpers._allQuotesDataLoc, 'w+', encoding='UTF-8')
-    for file in os.listdir(helpers._allQuotesDataLoc):
+    for file in os.listdir(helpers._quotesDataLoc):
         if not file.endswith(".txt"):
             continue
         f = io.open('{0}\\{1}'.format(helpers._allQuotesDataLoc, file), encoding='UTF-8')
@@ -176,14 +175,9 @@ def parsePages():
     fq.close()
     print("Completed!")
 
-def ParseUserpages():
-    #this code looks badly too
-    if os.path.exists(helpers._processedDataLoc):
-        if os.path.exists(helpers._allUserdataDataLoc):
-            os.remove(helpers._allUserdataDataLoc)
-            print("Old " + helpers._allUserdataDataLoc + " is removed.")
-    else:
-        os.mkdir(helpers._processedDataLoc)
+def parseUserpages():
+    if not os.path.exists(helpers._processedDataLoc):
+        os.mkdir(helpers._processedDataLoc, mode=666)
 
     allFiles = []
     if not os.path.exists(helpers._rawUserpagesDataLoc):
@@ -200,19 +194,24 @@ def ParseUserpages():
 
     fp = io.open(helpers._allUserdataDataLoc, 'w+',encoding="UTF-8")
     for file in allFiles:
-        sname = file[:-4]
+        sname = file[:-5]
         
         f = io.open('{0}\\{1}'.format(helpers._rawUserpagesDataLoc, file), encoding="UTF-8")
 
         text = f.read().replace('||','')
         soup = BeautifulSoup(text, 'html.parser')
 
-        getDataFromUserpages(soup, file)
-         
-        f.close()
+        data = getDataFromUserpage(soup, file)
+        fp.write('{0}||{1}||{2}||{3}||{4}\n'.format(data[0], sname, data[1], data[2], data[3]))        
         fp.flush()
         
+        f.close()
+        
         filesParsed += 1
-        print("File " + file + " is parsed. [" + str(filesParsed) + "/" + str(filesTotal) + "]")
+        print("File " + file + " is parsed. [" + str(filesParsed) + "/" + str(filesTotal) + "]\r")
+
     fp.close()
     print("Completed!")
+
+#parsePages()
+parseUserpages()
