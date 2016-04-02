@@ -7,6 +7,7 @@ rawUserpagesDataLoc =       rawDataLoc + "\\users"
 processedDataLoc =          "processedData"
 messagesDataLoc =           processedDataLoc + "\\messages"
 quotesDataLoc =             processedDataLoc + "\\quotes"
+personalDataLoc =           processedDataLoc + "\\personalData"
 allMessagesDataLoc =        processedDataLoc + "\\allMessages.txt"
 allQuotesDataLoc =          processedDataLoc + "\\allQuotes.txt"
 allUserdataDataLoc =        processedDataLoc + "\\allUserdata.txt"
@@ -26,7 +27,7 @@ wordFrequencyEnLoc =   "__lemma3.txt"
 cookiesDataLoc = "__private_key.txt"
 
 threadCount = 3
-topicCount = 50
+topicCount = 75
 usersCount = 143 # :3
 
 errorText = "Извините, мы не можем найти это!"

@@ -15,10 +15,11 @@ def main():
             print("Shutting down")
             return
     
-    #tdownloader.downloadUserpages()
-    #tdownloader.downloadPages()
-    #pageparser.parsePages()
-    #pageparser.parseUserpages()
+    
+    tdownloader.downloadPages()
+    pageparser.parsePages()
+    tdownloader.downloadUserpages()
+    pageparser.parseUserpages()
     messageparser.parseMessages()
 
     
