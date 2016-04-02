@@ -9,7 +9,7 @@ requests_cache.install_cache('__forum.ss13.ru')
 s = requests.session()
 s.keep_alive = False
 
-def makeRequest(address, cookies = helpers._cookies):
+def makeRequest(address, cookies = helpers.cookies):
     try:
         r = requests.get(address, cookies=cookies)
     except BaseException as s:
@@ -28,7 +28,7 @@ def getMessagePagesAsync(topicPagesToDownload):
             else:
                 return
 
-        if os.path.exists('{0}\\{1}'.format(helpers._rawTopicsDataLoc, helpers.getPageFilename(dnext[0], dnext[1]))):
+        if os.path.exists('{0}\\{1}'.format(helpers.rawTopicsDataLoc, helpers.getPageFilename(dnext[0], dnext[1]))):
             print("{0} is already exists!\n".format(helpers.getPageFilename(dnext[0], dnext[1])), end='')
             retry = 0
             topicPagesToDownload.append((dnext[0], dnext[1] + 1))
@@ -57,9 +57,9 @@ def getMessagePagesAsync(topicPagesToDownload):
         retry = 0
         topicPagesToDownload.append((dnext[0], dnext[1] + 1))
         
-        if not os.path.exists(helpers._rawTopicsDataLoc):
-            os.mkdir(helpers._rawTopicsDataLoc)
-        f = io.open(helpers._rawTopicsDataLoc + "\\" + helpers.getPageFilename(dnext[0], dnext[1]), "w+", encoding="UTF-8")
+        if not os.path.exists(helpers.rawTopicsDataLoc):
+            os.mkdir(helpers.rawTopicsDataLoc)
+        f = io.open(helpers.rawTopicsDataLoc + "\\" + helpers.getPageFilename(dnext[0], dnext[1]), "w+", encoding="UTF-8")
         f.write(page.text)
         f.close()
 
@@ -69,7 +69,7 @@ def getUserpagesAsync(userpagesToDownload):
     while len(userpagesToDownload) > 0:
         dnext = userpagesToDownload.pop()
         
-        if os.path.exists('{0}\\{1}'.format(helpers._rawUserpagesDataLoc, helpers.getUserpageFilename(dnext))):
+        if os.path.exists('{0}\\{1}'.format(helpers.rawUserpagesDataLoc, helpers.getUserpageFilename(dnext))):
             print("{0} is already exists!\n".format(helpers.getUserpageFilename(dnext)), end='')
             continue
 
@@ -78,9 +78,9 @@ def getUserpagesAsync(userpagesToDownload):
         if helpers.isErrorPage(page.text):
             continue
         
-        if not os.path.exists(helpers._rawUserpagesDataLoc):
-            os.mkdir(helpers._rawUserpagesDataLoc)
-        f = io.open('{0}\\{1}'.format(helpers._rawUserpagesDataLoc, helpers.getUserpageFilename(dnext)), "w+", encoding="UTF-8")
+        if not os.path.exists(helpers.rawUserpagesDataLoc):
+            os.mkdir(helpers.rawUserpagesDataLoc)
+        f = io.open('{0}\\{1}'.format(helpers.rawUserpagesDataLoc, helpers.getUserpageFilename(dnext)), "w+", encoding="UTF-8")
         f.write(page.text)
         f.close()
 
@@ -90,7 +90,7 @@ def downloadDataAsync(method, args):
     activeThreads = []
     downloadingStarted = time.time()
 
-    for threads in range(helpers._threadCount):
+    for threads in range(helpers.threadCount):
         t = threading.Thread(target=method, args=(args,))
         t.start()
         activeThreads.append(t)
@@ -104,7 +104,7 @@ def downloadDataAsync(method, args):
 def downloadPages():
     topicsToDownload = []
 
-    for i in range(1, helpers._topicCount + 1):
+    for i in range(1, helpers.topicCount + 1):
         topicsToDownload.insert(0, (i, 1))
 
     downloadDataAsync(getMessagePagesAsync, topicsToDownload)
@@ -112,7 +112,7 @@ def downloadPages():
 def downloadUserpages():
     userpagesToDownload = []
 
-    for i in range(1, helpers._usersCount + 1):
+    for i in range(1, helpers.usersCount + 1):
         userpagesToDownload.insert(0, i)
 
     downloadDataAsync(getUserpagesAsync, userpagesToDownload)

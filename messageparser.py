@@ -16,8 +16,8 @@ class WordCounter:
         self.unknownWordsCounter = Counter()
 
     def doWork(self):
-        print("Reading from: " + helpers._messagesDataLoc)
-        f = io.open(helpers._messagesDataLoc, 'r', encoding='UTF-8')
+        print("Reading from: " + helpers.messagesDataLoc)
+        f = io.open(helpers.messagesDataLoc, 'r', encoding='UTF-8')
         for text in f:
             msg = text.split('||')
             text = msg[6]
@@ -50,15 +50,15 @@ class WordCounter:
     def finalize(self):
         frequencyTable = Counter()
         
-        print("Reading from: " + helpers._wordFrequencyRuLoc)
-        f = io.open(helpers._wordFrequencyRuLoc, 'r', encoding="UTF-8")
+        print("Reading from: " + helpers.wordFrequencyRuLoc)
+        f = io.open(helpers.wordFrequencyRuLoc, 'r', encoding="UTF-8")
         for text in f:
             lemma = text.strip().split(' ')
             frequencyTable[lemma[1]] = float(lemma[0])
         f.close()
 
-        print("Reading from: " + helpers._wordFrequencyEnLoc)
-        f = io.open(helpers._wordFrequencyEnLoc, 'r', encoding="UTF-8")
+        print("Reading from: " + helpers.wordFrequencyEnLoc)
+        f = io.open(helpers.wordFrequencyEnLoc, 'r', encoding="UTF-8")
         for text in f:
             lemma = text.strip().split(' ')
             frequencyTable[lemma[1]] = float(lemma[0])
@@ -69,20 +69,20 @@ class WordCounter:
             self.frequentWordsCounter[word[0]] = round(word[1] * 100000 / frequency)
         
     def saveData(self):
-        print("Writing to: " + helpers._wordsDataLoc)
-        f = io.open(helpers._wordsDataLoc, 'w+', encoding="UTF-8")
+        print("Writing to: " + helpers.wordsDataLoc)
+        f = io.open(helpers.wordsDataLoc, 'w+', encoding="UTF-8")
         for word in self.wordsCounter.most_common():
             f.write(str(word[1]) + ":" + word[0] + "\n")
         f.close()
 
-        print("Writing to: " + helpers._unknownWordsDataLoc)
-        f = io.open(helpers._unknownWordsDataLoc, 'w+', encoding="UTF-8")
+        print("Writing to: " + helpers.unknownWordsDataLoc)
+        f = io.open(helpers.unknownWordsDataLoc, 'w+', encoding="UTF-8")
         for word in self.unknownWordsCounter.most_common():
             f.write(str(word[1]) + ":" + word[0] + "\n")
         f.close()
 
-        print("Writing to: " + helpers._frequentWordsDataLoc)
-        f = io.open(helpers._frequentWordsDataLoc, 'w+', encoding="UTF-8")
+        print("Writing to: " + helpers.frequentWordsDataLoc)
+        f = io.open(helpers.frequentWordsDataLoc, 'w+', encoding="UTF-8")
         for word in self.frequentWordsCounter.most_common():
             f.write(str(word[1]) + ":" + word[0] + "\n")
         f.close()
@@ -93,8 +93,8 @@ class CitationCounter:
         self.nicknameCounter = Counter()
 
     def doWork(self):
-        print("Reading from: " + helpers._quotesDataLoc)
-        f = io.open(helpers._quotesDataLoc, 'r', encoding="UTF-8")
+        print("Reading from: " + helpers.quotesDataLoc)
+        f = io.open(helpers.quotesDataLoc, 'r', encoding="UTF-8")
         for text in f:
             msg = text.split('||')
             self.nicknameCounter[msg[3]] += 1
@@ -104,8 +104,8 @@ class CitationCounter:
         return
 
     def saveData(self):
-        print("Writing to: " + helpers._citationCountDataLoc)
-        f = io.open(helpers._citationCountDataLoc, 'w+', encoding="UTF-8")
+        print("Writing to: " + helpers.citationCountDataLoc)
+        f = io.open(helpers.citationCountDataLoc, 'w+', encoding="UTF-8")
         for word in self.nicknameCounter.most_common():
             f.write(str(word[1]) + ":" + word[0] + "\n")
         f.close()
@@ -122,8 +122,8 @@ class MostLeastVotedContent:
             self.leastVoted.append((-1, "No sender", "No URL"))
         
     def doWork(self):
-        print("Reading from: " + helpers._messagesDataLoc)
-        f = io.open(helpers._messagesDataLoc, 'r', encoding="UTF-8")
+        print("Reading from: " + helpers.messagesDataLoc)
+        f = io.open(helpers.messagesDataLoc, 'r', encoding="UTF-8")
         for text in f:
             msg = text.split('||')
             msgRep = int(msg[4])
@@ -151,8 +151,8 @@ class MostLeastVotedContent:
         return
 
     def saveData(self):
-        print("Writing to: " + helpers._ratedContentDataLoc)
-        f = io.open(helpers._ratedContentDataLoc, 'w+', encoding="UTF-8")
+        print("Writing to: " + helpers.ratedContentDataLoc)
+        f = io.open(helpers.ratedContentDataLoc, 'w+', encoding="UTF-8")
         for entry in self.mostVoted:
             f.write('{0}:{1} - {2}\n'.format(entry[0], entry[1], entry[2]))
         f.write('\n')
@@ -168,8 +168,8 @@ class TopicStartersCounter:
     def doWork(self):
         lastTopicID = '0'
         
-        print("Reading from: " + helpers._messagesDataLoc)
-        f = io.open(helpers._messagesDataLoc, 'r', encoding="UTF-8")
+        print("Reading from: " + helpers.messagesDataLoc)
+        f = io.open(helpers.messagesDataLoc, 'r', encoding="UTF-8")
         for text in f:
             msg = text.split('||')
             if lastTopicID != msg[0]:
@@ -181,8 +181,8 @@ class TopicStartersCounter:
         self.starterCounter['Гость__*'] = -1
 
     def saveData(self):
-        print("Writing to: " + helpers._topicStartersDataLoc)
-        f = io.open(helpers._topicStartersDataLoc, 'w+', encoding="UTF-8")
+        print("Writing to: " + helpers.topicStartersDataLoc)
+        f = io.open(helpers.topicStartersDataLoc, 'w+', encoding="UTF-8")
         for word in self.starterCounter.most_common():
             f.write(str(word[1]) + ":" + word[0] + "\n")
         f.close()
@@ -194,8 +194,8 @@ class PublicMessagesCounter:
         self.msgauthors = Counter()
 
     def doWork(self):
-        print("Reading from: " + helpers._messagesDataLoc)
-        f = io.open(helpers._messagesDataLoc, 'r', encoding="UTF-8")
+        print("Reading from: " + helpers.messagesDataLoc)
+        f = io.open(helpers.messagesDataLoc, 'r', encoding="UTF-8")
         for text in f:
             msg = text.split('||')
             self.msgauthors[msg[3]] += 1
@@ -205,8 +205,8 @@ class PublicMessagesCounter:
         return
 
     def saveData(self):
-        print("Writing to: " + helpers._msgsCountDataLoc)
-        f = io.open(helpers._msgsCountDataLoc, 'w+', encoding="UTF-8")
+        print("Writing to: " + helpers.msgsCountDataLoc)
+        f = io.open(helpers.msgsCountDataLoc, 'w+', encoding="UTF-8")
         for word in self.msgauthors.most_common():
             f.write(str(word[1]) + ":" + word[0] + "\n")
         f.close()

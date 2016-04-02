@@ -1,62 +1,62 @@
 import time, io
 
-_rawDataLoc =               "rawData"
-_rawTopicsDataLoc =         _rawDataLoc + "\\topics"
-_rawUserpagesDataLoc =      _rawDataLoc + "\\users"
+rawDataLoc =               "rawData"
+rawTopicsDataLoc =         rawDataLoc + "\\topics"
+rawUserpagesDataLoc =      rawDataLoc + "\\users"
 
-_processedDataLoc =         "processedData"
-_messagesDataLoc =          _processedDataLoc + "\\messages"
-_quotesDataLoc =            _processedDataLoc + "\\quotes"
-_allMessagesDataLoc =       _processedDataLoc + "\\allMessages.txt"
-_allQuotesDataLoc =         _processedDataLoc + "\\allQuotes.txt"
-_allUserdataDataLoc =       _processedDataLoc + "\\allUserdata.txt"
-_wordsDataLoc =             _processedDataLoc + "\\words.txt"
-_unknownWordsDataLoc =      _processedDataLoc + "\\unknownWords.txt"
-_frequentWordsDataLoc =     _processedDataLoc + "\\frequentWords.txt"
-_citationCountDataLoc =     _processedDataLoc + "\\citationCount.txt"
-_ratedContentDataLoc =      _processedDataLoc + "\\ratedContent.txt"
-_topicStartersDataLoc =     _processedDataLoc + "\\topicStarters.txt"
-_msgsCountDataLoc =         _processedDataLoc + "\\publicMessagesCount.txt"
+processedDataLoc =         "processedData"
+messagesDataLoc =          processedDataLoc + "\\messages"
+quotesDataLoc =            processedDataLoc + "\\quotes"
+allMessagesDataLoc =       processedDataLoc + "\\allMessages.txt"
+allQuotesDataLoc =         processedDataLoc + "\\allQuotes.txt"
+allUserdataDataLoc =       processedDataLoc + "\\allUserdata.txt"
+wordsDataLoc =             processedDataLoc + "\\words.txt"
+unknownWordsDataLoc =      processedDataLoc + "\\unknownWords.txt"
+frequentWordsDataLoc =     processedDataLoc + "\\frequentWords.txt"
+citationCountDataLoc =     processedDataLoc + "\\citationCount.txt"
+ratedContentDataLoc =      processedDataLoc + "\\ratedContent.txt"
+topicStartersDataLoc =     processedDataLoc + "\\topicStarters.txt"
+msgsCountDataLoc =         processedDataLoc + "\\publicMessagesCount.txt"
 
-_wordFrequencyRuLoc =   "__lemma2.txt"
-_wordFrequencyEnLoc =   "__lemma3.txt"
-_cookiesDataLoc = "__private_key.txt"
+wordFrequencyRuLoc =   "__lemma2.txt"
+wordFrequencyEnLoc =   "__lemma3.txt"
+cookiesDataLoc = "__private_key.txt"
 
-_threadCount = 3
-_topicCount = 50
-_usersCount = 143 # :3
+threadCount = 3
+topicCount = 50
+usersCount = 143 # :3
 
-_errorText = "Извините, мы не можем найти это!"
-_notExistsText = """<p class='ipsType_sectiontitle'>
+errorText = "Извините, мы не можем найти это!"
+notExistsText = """<p class='ipsType_sectiontitle'>
 			Эта страница не существует
 		</p>"""
-_noAccessText = """<p class='ipsType_sectiontitle'>
+noAccessText = """<p class='ipsType_sectiontitle'>
 			Вы не можете просматривать эту тему.
 		</p>"""
-_userNotExists = """Вы запросили профиль несуществующего пользователя."""
-_nginxError = "Sorry, the page you are looking for is currently unavailable."
+userNotExists = """Вы запросили профиль несуществующего пользователя."""
+nginxError = "Sorry, the page you are looking for is currently unavailable."
 
-_cookies = {}
+cookies = {}
 
 def isErrorPage(dat):
-    return _errorText in dat or _nginxError in dat or _userNotExists in dat
+    return errorText in dat or nginxError in dat or userNotExists in dat
 
 def isPageNotExists(dat):
-    return _notExistsText in dat
+    return notExistsText in dat
 
 def isNoAccessToPage(dat):
-    return _noAccessText in dat
+    return noAccessText in dat
 
 def timeSince(startTime):
     return time.strftime("%M:%S", time.gmtime(time.time() - startTime))
 
 def loadPrivateKey():
-    f = io.open(_cookiesDataLoc, 'r', encoding="UTF-8")
+    f = io.open(cookiesDataLoc, 'r', encoding="UTF-8")
     for text in f:
         if text.startswith('#'):
             continue
         text = text.strip().split(' ')
-        _cookies[text[0].strip()] = text[1].strip()
+        cookies[text[0].strip()] = text[1].strip()
     f.close()
 
 def getPageURL(topicID, page = None, entry = None):

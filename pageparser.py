@@ -108,18 +108,18 @@ def getDataFromUserpage(soup, fileName):
     return (nick, group, msgsCount, watchedTimes)
 
 def parsePages():
-    if not os.path.exists(helpers._processedDataLoc):
-        os.mkdir(helpers._processedDataLoc, mode=666)
-    if not os.path.exists(helpers._messagesDataLoc):
-        os.mkdir(helpers._messagesDataLoc, mode=666)
-    if not os.path.exists(helpers._quotesDataLoc):
-        os.mkdir(helpers._quotesDataLoc, mode=666)
+    if not os.path.exists(helpers.processedDataLoc):
+        os.mkdir(helpers.processedDataLoc, mode=666)
+    if not os.path.exists(helpers.messagesDataLoc):
+        os.mkdir(helpers.messagesDataLoc, mode=666)
+    if not os.path.exists(helpers.quotesDataLoc):
+        os.mkdir(helpers.quotesDataLoc, mode=666)
     
     allFiles = []
-    if not os.path.exists(helpers._rawTopicsDataLoc):
-        print(helpers._rawDataLoc + " is not found!")
+    if not os.path.exists(helpers.rawTopicsDataLoc):
+        print(helpers.rawDataLoc + " is not found!")
         return False
-    for file in os.listdir(helpers._rawTopicsDataLoc):
+    for file in os.listdir(helpers.rawTopicsDataLoc):
         if file.endswith(".html"):
             allFiles.append(file)
 
@@ -131,9 +131,9 @@ def parsePages():
     for file in allFiles:
         sname = file[:-5]
         
-        f = io.open('{0}\\{1}'.format(helpers._rawTopicsDataLoc, file), encoding="UTF-8")
-        fm = io.open('{0}\\{1}.txt'.format(helpers._messagesDataLoc, sname), 'w+',encoding="UTF-8")
-        fq = io.open('{0}\\{1}.txt'.format(helpers._quotesDataLoc, sname), 'w+',encoding="UTF-8")
+        f = io.open('{0}\\{1}'.format(helpers.rawTopicsDataLoc, file), encoding="UTF-8")
+        fm = io.open('{0}\\{1}.txt'.format(helpers.messagesDataLoc, sname), 'w+',encoding="UTF-8")
+        fq = io.open('{0}\\{1}.txt'.format(helpers.quotesDataLoc, sname), 'w+',encoding="UTF-8")
         
         text = f.read().replace('||','')
         
@@ -154,36 +154,36 @@ def parsePages():
         fq.close()
 
         filesParsed += 1
-        print("File " + file + " is parsed. [" + str(filesParsed) + "/" + str(filesTotal) + "]\r")
+        print("File " + file + " is parsed. [" + str(filesParsed) + "/" + str(filesTotal) + "]")
 
     print("Finalizing...")
-    fm = io.open(helpers._allMessagesDataLoc, 'w+', encoding='UTF-8')
-    for file in os.listdir(helpers._messagesDataLoc):
+    fm = io.open(helpers.allMessagesDataLoc, 'w+', encoding='UTF-8')
+    for file in os.listdir(helpers.messagesDataLoc):
         if not file.endswith(".txt"):
             continue
-        f = io.open('{0}\\{1}'.format(helpers._messagesDataLoc, file), encoding='UTF-8')
+        f = io.open('{0}\\{1}'.format(helpers.messagesDataLoc, file), encoding='UTF-8')
         for line in f:
             fm.write(line)
     fm.close()
-    fq = io.open(helpers._allQuotesDataLoc, 'w+', encoding='UTF-8')
-    for file in os.listdir(helpers._quotesDataLoc):
+    fq = io.open(helpers.allQuotesDataLoc, 'w+', encoding='UTF-8')
+    for file in os.listdir(helpers.quotesDataLoc):
         if not file.endswith(".txt"):
             continue
-        f = io.open('{0}\\{1}'.format(helpers._allQuotesDataLoc, file), encoding='UTF-8')
+        f = io.open('{0}\\{1}'.format(helpers.quotesDataLoc, file), encoding='UTF-8')
         for line in f:
             fq.write(line)
     fq.close()
     print("Completed!")
 
 def parseUserpages():
-    if not os.path.exists(helpers._processedDataLoc):
-        os.mkdir(helpers._processedDataLoc, mode=666)
+    if not os.path.exists(helpers.processedDataLoc):
+        os.mkdir(helpers.processedDataLoc, mode=666)
 
     allFiles = []
-    if not os.path.exists(helpers._rawUserpagesDataLoc):
-        print(helpers._rawUserpagesDataLoc + " is not found!")
+    if not os.path.exists(helpers.rawUserpagesDataLoc):
+        print(helpers.rawUserpagesDataLoc + " is not found!")
         return False
-    for file in os.listdir(helpers._rawUserpagesDataLoc):
+    for file in os.listdir(helpers.rawUserpagesDataLoc):
         if file.endswith(".html"):
             allFiles.append(file)
 
@@ -192,11 +192,11 @@ def parseUserpages():
 
     print("Found " + str(filesTotal) + " files total.")
 
-    fp = io.open(helpers._allUserdataDataLoc, 'w+',encoding="UTF-8")
+    fp = io.open(helpers.allUserdataDataLoc, 'w+',encoding="UTF-8")
     for file in allFiles:
         sname = file[:-5]
         
-        f = io.open('{0}\\{1}'.format(helpers._rawUserpagesDataLoc, file), encoding="UTF-8")
+        f = io.open('{0}\\{1}'.format(helpers.rawUserpagesDataLoc, file), encoding="UTF-8")
 
         text = f.read().replace('||','')
         soup = BeautifulSoup(text, 'html.parser')
@@ -208,10 +208,10 @@ def parseUserpages():
         f.close()
         
         filesParsed += 1
-        print("File " + file + " is parsed. [" + str(filesParsed) + "/" + str(filesTotal) + "]\r")
+        print("File " + file + " is parsed. [" + str(filesParsed) + "/" + str(filesTotal) + "]")
 
     fp.close()
     print("Completed!")
 
-#parsePages()
+parsePages()
 parseUserpages()
