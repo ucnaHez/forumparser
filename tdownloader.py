@@ -9,124 +9,110 @@ requests_cache.install_cache('__forum.ss13.ru')
 s = requests.session()
 s.keep_alive = False
 
-_startTime = time.time()
-
-def makeRequest(address):
+def makeRequest(address, cookies = helpers.cookies):
     try:
-        r = requests.get(address, cookies=helpers._cookies)
+        r = requests.get(address, cookies=cookies)
     except BaseException as s:
         print(address + " - " + str(s))
         return None
     return r
 
-def getTopic(id, page):
-    return makeRequest(helpers.getPageURL(id, page))
-
-def saveTopic(request, id, page):   
-    if not os.path.exists(helpers._rawTopicsDataLoc):
-        os.mkdir(helpers._rawTopicsDataLoc)
-    f = io.open(helpers._rawTopicsDataLoc + "\\" + helpers.getPageFilename(id, page), "w+", encoding="UTF-8")
-    f.write(request.text)
-    f.close()
-
-def reportCompletion(id, pages):
-    timePassed = helpers.timeSince(_startTime)
-    print("[" + timePassed + "] Access to topic " + str(id) + " successed. Total " + str(pages - 1) + " pages are downloaded.\n", end="")
-
-def reportFailure(id, pages):
-    timePassed = helpers.timeSince(_startTime)
-    print("[" + timePassed + "] Access to " + str(id) + " failed on page " + str(pages) + ".\n", end="")
-
-def reportCustom(text):
-    timePassed = helpers.timeSince(_startTime)
-    print("[" + timePassed + "] " + text + "\n", end="")
-
-def reportCacheFixing(id):
-    print("Cached data of topic " + id + " is fixed.")
-    
-def getNextTopic():
-    global currentTopicID
-    global maxTopicCount
-
-    tls = threading.local()
-    tls.started_call = time.time()
-    tls.ended_call = time.time()
-    
-    while currentTopicID < maxTopicCount:
-        tls.started_call = time.time()
-        
-        localID = currentTopicID = currentTopicID + 1
-        cmpl = getAndSaveSubPages(localID)
-        
-        if cmpl[0] == True:
-            if cmpl[1] == -1:
-                reportFailure(localID, cmpl[1])
+def getMessagePagesAsync(topicPagesToDownload):
+    retry = 0
+    while len(topicPagesToDownload) > 0:
+        dnext = topicPagesToDownload.pop()
+        if retry > 5:
+            if len(topicPagesToDownload) > 0:
+                retry = 0
+                dnext = topicPagesToDownload.pop()
             else:
-                reportCompletion(localID, cmpl[1])
-        else: #something wrong with connection. Let's slow our pace
-            time.sleep(5)
-            cmpl = getAndSaveSubPages(localID, cmpl[1])
-            if cmpl[0] == True:
-                if cmpl[1] == -1:
-                    reportFailure(localID, cmpl[1])
-                else:
-                    reportCompletion(localID, cmpl[1])
-            else:
-                reportFailure(localID, cmpl[1])
-                time.sleep(10)
-                
-        tls.finished_call = time.time()
+                return
 
-def getAndSaveSubPages(id, frompage = 1):
-    page = frompage
-    while True:
-        request = getTopic(id, page)
-        if request is None:
-            return (False, page)
-
-        if helpers.isNoAccessToPage(request.text):
-            return (True, -1)
+        if os.path.exists('{0}\\{1}'.format(helpers.rawTopicsDataLoc, helpers.getPageFilename(dnext[0], dnext[1]))):
+            print("{0} is already exists!\n".format(helpers.getPageFilename(dnext[0], dnext[1])), end='')
+            retry = 0
+            topicPagesToDownload.append((dnext[0], dnext[1] + 1))
+            continue
         
-        if helpers.isPageNotExists(request.text):
-            return (True, page)
-
-        #hotfix S:
-        if helpers.isErrorPage(request.text):
-            return (True, page)
-
-        saveTopic(request, id, page)
+        page = makeRequest(helpers.getPageURL(dnext[0], dnext[1]))
         
-        reportCustom("Downloaded page " + str(page) + " of topic " + str(id) + ".")
-        page = page + 1
+        if page is None:
+            retry += 1
+            topicPagesToDownload.append(dnext)
+            continue
 
-def download_cache():
-    global currentTopicID
-    currentTopicID = 0
+        if helpers.isNoAccessToPage(page.text):
+            retry = 0
+            continue
 
-    global maxTopicCount
-    maxTopicCount = helpers._topicCount   
+        if helpers.isPageNotExists(page.text):
+            retry = 0
+            continue
 
-    active_threads = []
+        if helpers.isErrorPage(page.text):
+            retry += 1
+            topicPagesToDownload.append(dnext)
+            continue
 
-    for topicNum in range(helpers._threadCount): #thread jobs
-        t = threading.Thread(target=getNextTopic)
+        retry = 0
+        topicPagesToDownload.append((dnext[0], dnext[1] + 1))
+        
+        if not os.path.exists(helpers.rawTopicsDataLoc):
+            os.mkdir(helpers.rawTopicsDataLoc)
+        f = io.open(helpers.rawTopicsDataLoc + "\\" + helpers.getPageFilename(dnext[0], dnext[1]), "w+", encoding="UTF-8")
+        f.write(page.text)
+        f.close()
+
+        print("Page {0} of topic {1} were saved to {2}\n".format(dnext[1], dnext[0], helpers.getPageFilename(dnext[0], dnext[1])), end='')
+
+def getUserpagesAsync(userpagesToDownload):
+    while len(userpagesToDownload) > 0:
+        dnext = userpagesToDownload.pop()
+        
+        if os.path.exists('{0}\\{1}'.format(helpers.rawUserpagesDataLoc, helpers.getUserpageFilename(dnext))):
+            print("{0} is already exists!\n".format(helpers.getUserpageFilename(dnext)), end='')
+            continue
+
+        page = makeRequest(helpers.getUserpageURL(dnext))
+
+        if helpers.isErrorPage(page.text):
+            continue
+        
+        if not os.path.exists(helpers.rawUserpagesDataLoc):
+            os.mkdir(helpers.rawUserpagesDataLoc)
+        f = io.open('{0}\\{1}'.format(helpers.rawUserpagesDataLoc, helpers.getUserpageFilename(dnext)), "w+", encoding="UTF-8")
+        f.write(page.text)
+        f.close()
+
+        print("Userpage {0} were saved to {1}\n".format(dnext, helpers.getUserpageFilename(dnext)), end='') 
+
+def downloadDataAsync(method, args):
+    activeThreads = []
+    downloadingStarted = time.time()
+
+    for threads in range(helpers.threadCount):
+        t = threading.Thread(target=method, args=(args,))
         t.start()
+        activeThreads.append(t)
 
-        active_threads.append(t)
-
-    for t in active_threads: #close them as fast as they finished their job
+    for t in activeThreads:
         t.join()
 
-    print("Completed in " + helpers.timeSince(_startTime) + "!")
+    print("Downloading is completed in " + helpers.timeSince(downloadingStarted) + "!")
 
-#def validate_cache():
-#    if os.path.exists(_dataLoc):
-#        for id in range(_maxTopicCount):
-#            if not os.path.exists(_dataLoc + "\\" + str(id) + ".html"):
-#                while not getAndSaveTopicByID(id):
-#                    print("Could not retrieve topic " + str(id))
-#                    time.sleep(1)
-#                reportCacheFixing(str(id))
-#        print("Data validated!")
-#    else:
-#        print(_dataLoc + " path is not exists")
+#public members
+def downloadPages():
+    topicsToDownload = []
+
+    for i in range(1, helpers.topicCount + 1):
+        topicsToDownload.insert(0, (i, 1))
+
+    downloadDataAsync(getMessagePagesAsync, topicsToDownload)
+
+def downloadUserpages():
+    userpagesToDownload = []
+
+    for i in range(1, helpers.usersCount + 1):
+        userpagesToDownload.insert(0, i)
+
+    downloadDataAsync(getUserpagesAsync, userpagesToDownload)
