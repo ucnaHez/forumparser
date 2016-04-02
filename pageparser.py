@@ -202,6 +202,7 @@ def parseUserpages():
         soup = BeautifulSoup(text, 'html.parser')
 
         data = getDataFromUserpage(soup, file)
+        #0-nick 1-id 2-group 3-msgsCount 4-watchedTimes
         fp.write('{0}||{1}||{2}||{3}||{4}\n'.format(data[0], sname, data[1], data[2], data[3]))        
         fp.flush()
         
@@ -212,6 +213,3 @@ def parseUserpages():
 
     fp.close()
     print("Completed!")
-
-parsePages()
-parseUserpages()

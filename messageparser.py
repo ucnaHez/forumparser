@@ -2,12 +2,13 @@ import os, io, re, time
 import pymorphy2
 import helpers
 from collections import Counter
+from analyzer import Analyzer
 
 morph = pymorphy2.MorphAnalyzer()
 
 replaceRules = {'ии':'и'}
         
-class WordCounter:
+class WordCounter(Analyzer):
     def __init__(self):
         self.name = "Frequent words counter"
         self.pattern = re.compile('[\W_]+')
@@ -16,8 +17,8 @@ class WordCounter:
         self.unknownWordsCounter = Counter()
 
     def doWork(self):
-        print("Reading from: " + helpers.messagesDataLoc)
-        f = io.open(helpers.messagesDataLoc, 'r', encoding='UTF-8')
+        print("Reading from: " + helpers.allMessagesDataLoc)
+        f = io.open(helpers.allMessagesDataLoc, 'r', encoding='UTF-8')
         for text in f:
             msg = text.split('||')
             text = msg[6]
@@ -87,30 +88,7 @@ class WordCounter:
             f.write(str(word[1]) + ":" + word[0] + "\n")
         f.close()
 
-class CitationCounter:
-    def __init__(self):
-        self.name = "Most citated content"
-        self.nicknameCounter = Counter()
-
-    def doWork(self):
-        print("Reading from: " + helpers.quotesDataLoc)
-        f = io.open(helpers.quotesDataLoc, 'r', encoding="UTF-8")
-        for text in f:
-            msg = text.split('||')
-            self.nicknameCounter[msg[3]] += 1
-        f.close()
-
-    def finalize(self):
-        return
-
-    def saveData(self):
-        print("Writing to: " + helpers.citationCountDataLoc)
-        f = io.open(helpers.citationCountDataLoc, 'w+', encoding="UTF-8")
-        for word in self.nicknameCounter.most_common():
-            f.write(str(word[1]) + ":" + word[0] + "\n")
-        f.close()
-
-class MostLeastVotedContent:
+class MostLeastVotedContent(Analyzer):
     def __init__(self):
         self.name = "Most and least rated content"
         self.mostVoted = []
@@ -122,8 +100,8 @@ class MostLeastVotedContent:
             self.leastVoted.append((-1, "No sender", "No URL"))
         
     def doWork(self):
-        print("Reading from: " + helpers.messagesDataLoc)
-        f = io.open(helpers.messagesDataLoc, 'r', encoding="UTF-8")
+        print("Reading from: " + helpers.allMessagesDataLoc)
+        f = io.open(helpers.allMessagesDataLoc, 'r', encoding="UTF-8")
         for text in f:
             msg = text.split('||')
             msgRep = int(msg[4])
@@ -146,9 +124,6 @@ class MostLeastVotedContent:
                     self.leastVoted.pop()
                     break
         f.close()
-    
-    def finalize(self):
-        return
 
     def saveData(self):
         print("Writing to: " + helpers.ratedContentDataLoc)
@@ -160,57 +135,81 @@ class MostLeastVotedContent:
             f.write('{0}:{1} - {2}\n'.format(entry[0], entry[1], entry[2]))
         f.close()
 
-class TopicStartersCounter:
-    def __init__(self):
-        self.name = "Topic starters"
-        self.starterCounter = Counter()
-
+class SimpleIterator(Analyzer):
+    rawDataLoc = "Null"
+    procDataLoc = "Null"
+    dataCont = Counter()
+    
     def doWork(self):
-        lastTopicID = '0'
-        
-        print("Reading from: " + helpers.messagesDataLoc)
-        f = io.open(helpers.messagesDataLoc, 'r', encoding="UTF-8")
+        self.dataCont = Counter()
+        print("Reading from: " + self.rawDataLoc)
+        f = io.open(self.rawDataLoc, 'r', encoding="UTF-8")
         for text in f:
-            msg = text.split('||')
-            if lastTopicID != msg[0]:
-                self.starterCounter[msg[3]] += 1
-                lastTopicID = msg[0]
+            data = text.split('||')
+            self.feedData(data)
         f.close()
 
-    def finalize(self):
-        self.starterCounter['Гость__*'] = -1
-
     def saveData(self):
-        print("Writing to: " + helpers.topicStartersDataLoc)
-        f = io.open(helpers.topicStartersDataLoc, 'w+', encoding="UTF-8")
-        for word in self.starterCounter.most_common():
+        print("Writing to: " + self.procDataLoc)
+        f = io.open(self.procDataLoc, 'w+', encoding="UTF-8")
+        for word in self.dataCont.most_common():
             f.write(str(word[1]) + ":" + word[0] + "\n")
         f.close()
 
-#needs for other parsers
-class PublicMessagesCounter:
-    def __init__(self):
-        self.name = "Public messages"
-        self.msgauthors = Counter()
-
-    def doWork(self):
-        print("Reading from: " + helpers.messagesDataLoc)
-        f = io.open(helpers.messagesDataLoc, 'r', encoding="UTF-8")
-        for text in f:
-            msg = text.split('||')
-            self.msgauthors[msg[3]] += 1
-        f.close()
-
-    def finalize(self):
+    def feedData(self, data):
         return
 
-    def saveData(self):
-        print("Writing to: " + helpers.msgsCountDataLoc)
-        f = io.open(helpers.msgsCountDataLoc, 'w+', encoding="UTF-8")
-        for word in self.msgauthors.most_common():
-            f.write(str(word[1]) + ":" + word[0] + "\n")
-        f.close()
-    
+class TopicStartersCounter(SimpleIterator):
+    def __init__(self):
+        self.name = "Topic starters"
+        self.rawDataLoc = helpers.allMessagesDataLoc
+        self.procDataLoc = helpers.topicStartersDataLoc
+        self.lastTopicID = '0'
+        
+    def feedData(self, data):
+        if self.lastTopicID != data[0]:
+            self.dataCont[data[3]] += 1
+            self.lastTopicID = data[0]
+
+    def finalize(self):
+        self.dataCont['Гость__*'] = -1
+
+class CitationCounter(Analyzer):
+    def __init__(self):
+        self.name = "Most citated content"
+        self.rawDataLoc = helpers.allQuotesDataLoc
+        self.procDataLoc = helpers.citationCountDataLoc
+
+    def feedData(self, data):
+        dataCont[msg[3]] += 1
+
+#needs for other parsers
+class PublicMessagesCounter(SimpleIterator):
+    def __init__(self):
+        self.name = "Public messages"
+        self.rawDataLoc = helpers.allMessagesDataLoc
+        self.procDataLoc = helpers.msgsCountDataLoc
+        
+    def feedData(self, data):
+        self.dataCont[data[3]] += 1
+
+class MostWatchedUsersCounter(SimpleIterator):
+    def __init__(self):
+        self.name = "Most watched users"
+        self.rawDataLoc = helpers.allUserdataDataLoc
+        self.procDataLoc = helpers.mostWatchedDataLoc
+
+    def feedData(self, data):
+        self.dataCont[data[0]] += int(data[4])
+
+class PublicReputationCounter(SimpleIterator):
+    def __init__(self):
+        self.name = "Public reputation"
+        self.rawDataLoc = helpers.allMessagesDataLoc
+        self.procDataLoc = helpers.publicRepDataLoc
+
+    def feedData(self, data):
+        self.dataCont[data[3]] += int(data[4])
 
 def parseMessages():   
     analyzers = []
@@ -218,12 +217,15 @@ def parseMessages():
     analyzers.append(TopicStartersCounter())
     analyzers.append(CitationCounter())
     analyzers.append(PublicMessagesCounter())
+    analyzers.append(MostWatchedUsersCounter())
+    analyzers.append(PublicReputationCounter())
     #currently disabled due to long runtime
     #analyzers.append(WordCounter())
     
 
     for analyzer in analyzers:
         moduleStartTime = time.time()
+        print('-----')
         print('-Module {0} is now working.'.format(analyzer.name))
         try:
             analyzer.doWork()
@@ -243,4 +245,4 @@ def parseMessages():
             print('{0} module is failed on save stage. Error message: {1}'.format(analyzer.name, str(s)))
             continue
         print('-Module {0} finished work in {1} seconds.'.format(analyzer.name, str(time.time() - moduleStartTime)))    
-        print('-----')
+
