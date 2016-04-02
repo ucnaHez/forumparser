@@ -76,21 +76,25 @@ def getDataFromPosts(soup, fileName):
         d = post.find_all(class_='quote')
         
         if not p is None and not d is None:
-            for t in range(len(p)):
-                nick = findAllTextInBlock(p[t])
-                i = nick.find('(')
-                i2 = nick.find(':')
-                if i > 0 or i2 > 0:
-                    if i < 0:  
-                        nick = nick[:i2 - 7]
-                    else:
-                        nick = nick[:i - 1]
+            if len(p) != len(d):
+                errorOutput.write("Trouble with quotes in {0}! Message ID: {1}\n".format(fileName, postid))
+                errorOutput.flush()
+            else:
+                for t in range(len(p)):
+                    nick = findAllTextInBlock(p[t])
+                    i = nick.find('(')
+                    i2 = nick.find(':')
+                    if i > 0 or i2 > 0:
+                        if i < 0:  
+                            nick = nick[:i2 - 7]
+                        else:
+                            nick = nick[:i - 1]
 
-                    text = findAllTextInBlock(d[t])
-                    if text.isspace() or nick.isspace():
-                        print("Data not found: " + str(nick) + " - " + str(text))
-                    else:
-                        quotes.append((postid, nick, text))
+                        text = findAllTextInBlock(d[t])
+                        if text.isspace() or nick.isspace():
+                            print("Data not found: " + str(nick) + " - " + str(text))
+                        else:
+                            quotes.append((postid, nick, text))
                         
     return (messages, quotes)
 

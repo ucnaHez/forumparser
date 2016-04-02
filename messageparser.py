@@ -316,12 +316,12 @@ class PublicReputationCounter(SimpleIterator):
 
 def parseMessages():   
     analyzers = []
-    #analyzers.append(MostLeastVotedContent())
-    #analyzers.append(TopicStartersCounter())
-    #analyzers.append(CitationCounter())
-    #analyzers.append(PublicMessagesCounter())
-    #analyzers.append(MostWatchedUsersCounter())
-    #analyzers.append(PublicReputationCounter())
+    analyzers.append(MostLeastVotedContent())
+    analyzers.append(TopicStartersCounter())
+    analyzers.append(CitationCounter())
+    analyzers.append(PublicMessagesCounter())
+    analyzers.append(MostWatchedUsersCounter())
+    analyzers.append(PublicReputationCounter())
     #currently disabled due to long runtime
     #analyzers.append(WordCounter())
     analyzers.append(UserWordsAnalyzer())

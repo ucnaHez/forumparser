@@ -26,9 +26,9 @@ wordFrequencyRuLoc =   "__lemma2.txt"
 wordFrequencyEnLoc =   "__lemma3.txt"
 cookiesDataLoc = "__private_key.txt"
 
-threadCount = 3
-topicCount = 75
-usersCount = 143 # :3
+threadCount = 1
+topicCount = 15000
+usersCount = 6076 # :3
 
 errorText = "Извините, мы не можем найти это!"
 notExistsText = """<p class='ipsType_sectiontitle'>
@@ -38,12 +38,13 @@ noAccessText = """<p class='ipsType_sectiontitle'>
 			Вы не можете просматривать эту тему.
 		</p>"""
 userNotExists = """Вы запросили профиль несуществующего пользователя."""
+userNotAvailable = """Этот пользователь больше не активен."""
 nginxError = "Sorry, the page you are looking for is currently unavailable."
 
 cookies = {}
 
 def isErrorPage(dat):
-    return errorText in dat or nginxError in dat or userNotExists in dat
+    return errorText in dat or nginxError in dat or userNotExists in dat or userNotAvailable in dat
 
 def isPageNotExists(dat):
     return notExistsText in dat

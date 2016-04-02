@@ -72,7 +72,7 @@ def getUserpagesAsync(userpagesToDownload):
         if os.path.exists('{0}\\{1}'.format(helpers.rawUserpagesDataLoc, helpers.getUserpageFilename(dnext))):
             print("{0} is already exists!\n".format(helpers.getUserpageFilename(dnext)), end='')
             continue
-
+        
         page = makeRequest(helpers.getUserpageURL(dnext))
 
         if helpers.isErrorPage(page.text):
