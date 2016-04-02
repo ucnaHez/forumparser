@@ -1,5 +1,5 @@
-rawData/*
-processedData/*
-__pycache__/*
+rawData
+processedData
+__pycache__
 __private_key.txt
 *.sqlite
