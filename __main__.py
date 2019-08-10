@@ -17,11 +17,16 @@ def main():
             print("Shutting down")
             return
     
+   # tdownloader.downloadUserpages()
+  #  #tdownloader.downloadPages()
+ #   pageparser.parseUserpages()
+#    messageparser.parseMessages()
+
+    tdownloader.downloadPages()
+    pageparser.parsePages()
     tdownloader.downloadUserpages()
-    #tdownloader.downloadPages()
     pageparser.parseUserpages()
     messageparser.parseMessages()
-
     
 
 if __name__ == '__main__':
