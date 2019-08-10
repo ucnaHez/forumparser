@@ -3,3 +3,8 @@ processedData/*
 __pycache__/*
 __private_key.txt
 *.sqlite
+DAWG-0.7.8/
+dawg_python/
+pymorphy2-0.8/
+pymorphy2/
+pymorphy2_dicts/

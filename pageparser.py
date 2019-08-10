@@ -1,3 +1,5 @@
+# -*- coding: UTF-8 -*-
+
 #OH GOD DO SOMETHING WITH IT!
 #IT'S SOOOO BAD!!
 #-Done
@@ -109,11 +111,11 @@ def getDataFromUserpage(soup, fileName):
 
 def parsePages():
     if not os.path.exists(helpers.processedDataLoc):
-        os.mkdir(helpers.processedDataLoc, mode=666)
+        os.mkdir(helpers.processedDataLoc, mode=755)
     if not os.path.exists(helpers.messagesDataLoc):
-        os.mkdir(helpers.messagesDataLoc, mode=666)
+        os.mkdir(helpers.messagesDataLoc, mode=755)
     if not os.path.exists(helpers.quotesDataLoc):
-        os.mkdir(helpers.quotesDataLoc, mode=666)
+        os.mkdir(helpers.quotesDataLoc, mode=755)
     
     allFiles = []
     if not os.path.exists(helpers.rawTopicsDataLoc):
@@ -131,9 +133,9 @@ def parsePages():
     for file in allFiles:
         sname = file[:-5]
         
-        f = io.open('{0}\\{1}'.format(helpers.rawTopicsDataLoc, file), encoding="UTF-8")
-        fm = io.open('{0}\\{1}.txt'.format(helpers.messagesDataLoc, sname), 'w+',encoding="UTF-8")
-        fq = io.open('{0}\\{1}.txt'.format(helpers.quotesDataLoc, sname), 'w+',encoding="UTF-8")
+        f = io.open('{0}/{1}'.format(helpers.rawTopicsDataLoc, file), encoding="UTF-8")
+        fm = io.open('{0}/{1}.txt'.format(helpers.messagesDataLoc, sname), 'w+',encoding="UTF-8")
+        fq = io.open('{0}/{1}.txt'.format(helpers.quotesDataLoc, sname), 'w+',encoding="UTF-8")
         
         text = f.read().replace('||','')
         
@@ -161,7 +163,7 @@ def parsePages():
     for file in os.listdir(helpers.messagesDataLoc):
         if not file.endswith(".txt"):
             continue
-        f = io.open('{0}\\{1}'.format(helpers.messagesDataLoc, file), encoding='UTF-8')
+        f = io.open('{0}/{1}'.format(helpers.messagesDataLoc, file), encoding='UTF-8')
         for line in f:
             fm.write(line)
     fm.close()
@@ -169,7 +171,7 @@ def parsePages():
     for file in os.listdir(helpers.quotesDataLoc):
         if not file.endswith(".txt"):
             continue
-        f = io.open('{0}\\{1}'.format(helpers.quotesDataLoc, file), encoding='UTF-8')
+        f = io.open('{0}/{1}'.format(helpers.quotesDataLoc, file), encoding='UTF-8')
         for line in f:
             fq.write(line)
     fq.close()
@@ -177,7 +179,7 @@ def parsePages():
 
 def parseUserpages():
     if not os.path.exists(helpers.processedDataLoc):
-        os.mkdir(helpers.processedDataLoc, mode=666)
+        os.mkdir(helpers.processedDataLoc, mode=755)
 
     allFiles = []
     if not os.path.exists(helpers.rawUserpagesDataLoc):
@@ -196,7 +198,7 @@ def parseUserpages():
     for file in allFiles:
         sname = file[:-5]
         
-        f = io.open('{0}\\{1}'.format(helpers.rawUserpagesDataLoc, file), encoding="UTF-8")
+        f = io.open('{0}/{1}'.format(helpers.rawUserpagesDataLoc, file), encoding="UTF-8")
 
         text = f.read().replace('||','')
         soup = BeautifulSoup(text, 'html.parser')

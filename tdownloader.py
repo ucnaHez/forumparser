@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 #Требуется рефакторинг
 #Требуется оптимизация кода скачивания
 
@@ -28,7 +29,7 @@ def getMessagePagesAsync(topicPagesToDownload):
             else:
                 return
 
-        if os.path.exists('{0}\\{1}'.format(helpers.rawTopicsDataLoc, helpers.getPageFilename(dnext[0], dnext[1]))):
+        if os.path.exists('{0}/{1}'.format(helpers.rawTopicsDataLoc, helpers.getPageFilename(dnext[0], dnext[1]))):
             print("{0} is already exists!\n".format(helpers.getPageFilename(dnext[0], dnext[1])), end='')
             retry = 0
             topicPagesToDownload.append((dnext[0], dnext[1] + 1))
@@ -59,7 +60,7 @@ def getMessagePagesAsync(topicPagesToDownload):
         
         if not os.path.exists(helpers.rawTopicsDataLoc):
             os.mkdir(helpers.rawTopicsDataLoc)
-        f = io.open(helpers.rawTopicsDataLoc + "\\" + helpers.getPageFilename(dnext[0], dnext[1]), "w+", encoding="UTF-8")
+        f = io.open(helpers.rawTopicsDataLoc + "/" + helpers.getPageFilename(dnext[0], dnext[1]), "w+", encoding="UTF-8")
         f.write(page.text)
         f.close()
 
@@ -69,7 +70,7 @@ def getUserpagesAsync(userpagesToDownload):
     while len(userpagesToDownload) > 0:
         dnext = userpagesToDownload.pop()
         
-        if os.path.exists('{0}\\{1}'.format(helpers.rawUserpagesDataLoc, helpers.getUserpageFilename(dnext))):
+        if os.path.exists('{0}/{1}'.format(helpers.rawUserpagesDataLoc, helpers.getUserpageFilename(dnext))):
             print("{0} is already exists!\n".format(helpers.getUserpageFilename(dnext)), end='')
             continue
 
@@ -80,7 +81,7 @@ def getUserpagesAsync(userpagesToDownload):
         
         if not os.path.exists(helpers.rawUserpagesDataLoc):
             os.mkdir(helpers.rawUserpagesDataLoc)
-        f = io.open('{0}\\{1}'.format(helpers.rawUserpagesDataLoc, helpers.getUserpageFilename(dnext)), "w+", encoding="UTF-8")
+        f = io.open('{0}/{1}'.format(helpers.rawUserpagesDataLoc, helpers.getUserpageFilename(dnext)), "w+", encoding="UTF-8")
         f.write(page.text)
         f.close()
 

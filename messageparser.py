@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 import os, io, re, time
 import pymorphy2
 import helpers
