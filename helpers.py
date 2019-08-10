@@ -24,8 +24,8 @@ wordFrequencyEnLoc =   "__lemma3.txt"
 cookiesDataLoc = "__private_key.txt"
 
 threadCount = 3
-topicCount = 50
-usersCount = 143 # :3
+topicCount = 2
+usersCount = 15 # :3
 
 errorText = "Извините, мы не можем найти это!"
 notExistsText = """<p class='ipsType_sectiontitle'>

@@ -60,8 +60,8 @@ def getDataFromPosts(soup, fileName):
         repblock = postbody.find(class_="rep_bar")
         if repblock is None:
             rep = 0
-            errorOutput.write("No reputation error in {0}! Message ID: {1}\n".format(fileName, postid))
-            errorOutput.flush()
+#            errorOutput.write("No reputation error in {0}! Message ID: {1}\n".format(fileName, postid))	fuck disabled rep
+ #           errorOutput.flush()
         else:
             rep = findAllTextInBlock(repblock).replace(' ', '')
 

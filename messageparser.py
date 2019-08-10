@@ -94,8 +94,8 @@ class CitationCounter:
         self.nicknameCounter = Counter()
 
     def doWork(self):
-        print("Reading from: " + helpers.quotesDataLoc)
-        f = io.open(helpers.quotesDataLoc, 'r', encoding="UTF-8")
+        print("Reading from: " + helpers.allQuotesDataLoc)
+        f = io.open(helpers.allQuotesDataLoc, 'r', encoding="UTF-8")
         for text in f:
             msg = text.split('||')
             self.nicknameCounter[msg[3]] += 1
@@ -123,8 +123,8 @@ class MostLeastVotedContent:
             self.leastVoted.append((-1, "No sender", "No URL"))
         
     def doWork(self):
-        print("Reading from: " + helpers.messagesDataLoc)
-        f = io.open(helpers.messagesDataLoc, 'r', encoding="UTF-8")
+        print("Reading from: " + helpers.allMessagesDataLoc)
+        f = io.open(helpers.allMessagesDataLoc, 'r', encoding="UTF-8")
         for text in f:
             msg = text.split('||')
             msgRep = int(msg[4])
@@ -169,8 +169,8 @@ class TopicStartersCounter:
     def doWork(self):
         lastTopicID = '0'
         
-        print("Reading from: " + helpers.messagesDataLoc)
-        f = io.open(helpers.messagesDataLoc, 'r', encoding="UTF-8")
+        print("Reading from: " + helpers.allMessagesDataLoc)
+        f = io.open(helpers.allMessagesDataLoc, 'r', encoding="UTF-8")
         for text in f:
             msg = text.split('||')
             if lastTopicID != msg[0]:
@@ -195,8 +195,8 @@ class PublicMessagesCounter:
         self.msgauthors = Counter()
 
     def doWork(self):
-        print("Reading from: " + helpers.messagesDataLoc)
-        f = io.open(helpers.messagesDataLoc, 'r', encoding="UTF-8")
+        print("Reading from: " + helpers.allMessagesDataLoc)
+        f = io.open(helpers.allMessagesDataLoc, 'r', encoding="UTF-8")
         for text in f:
             msg = text.split('||')
             self.msgauthors[msg[3]] += 1
