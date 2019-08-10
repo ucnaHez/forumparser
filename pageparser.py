@@ -111,11 +111,12 @@ def getDataFromUserpage(soup, fileName):
 
 def parsePages():
     if not os.path.exists(helpers.processedDataLoc):
-        os.mkdir(helpers.processedDataLoc, mode=755)
+        os.mkdir(helpers.processedDataLoc)
+        print(helpers.processedDataLoc)
     if not os.path.exists(helpers.messagesDataLoc):
-        os.mkdir(helpers.messagesDataLoc, mode=755)
+        os.mkdir(helpers.messagesDataLoc)
     if not os.path.exists(helpers.quotesDataLoc):
-        os.mkdir(helpers.quotesDataLoc, mode=755)
+        os.mkdir(helpers.quotesDataLoc)
     
     allFiles = []
     if not os.path.exists(helpers.rawTopicsDataLoc):
@@ -179,7 +180,7 @@ def parsePages():
 
 def parseUserpages():
     if not os.path.exists(helpers.processedDataLoc):
-        os.mkdir(helpers.processedDataLoc, mode=755)
+        os.mkdir(helpers.processedDataLoc)
 
     allFiles = []
     if not os.path.exists(helpers.rawUserpagesDataLoc):
@@ -215,5 +216,5 @@ def parseUserpages():
     fp.close()
     print("Completed!")
 
-parsePages()
-parseUserpages()
+#parsePages()
+#parseUserpages()
