@@ -37,8 +37,12 @@ noAccessText = """<p class='ipsType_sectiontitle'>
 userNotExists = """Вы запросили профиль несуществующего пользователя."""
 userNotAvailable = """Этот пользователь больше не активен."""
 nginxError = "Sorry, the page you are looking for is currently unavailable."
+discordTitle = "Discord - Free voice and text chat for gamers"
 
 cookies = {}
+
+def isDiscord(dat):
+    return discordTitle in dat
 
 def isErrorPage(dat):
     return errorText in dat or nginxError in dat or userNotExists in dat or userNotAvailable in dat

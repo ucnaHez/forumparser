@@ -46,6 +46,10 @@ def getMessagePagesAsync(topicPagesToDownload):
             retry = 0
             continue
 
+        if helpers.isDiscord(page.text):
+            retry = 0
+            continue
+
         if helpers.isPageNotExists(page.text):
             retry = 0
             continue
@@ -104,8 +108,7 @@ def downloadDataAsync(method, args):
 #public members
 def downloadPages():
     topicsToDownload = []
-
-    for i in range(1, helpers.topicCount + 1):
+    for i in range(10345, helpers.topicCount + 1):
         topicsToDownload.insert(0, (i, 1))
 
     downloadDataAsync(getMessagePagesAsync, topicsToDownload)
