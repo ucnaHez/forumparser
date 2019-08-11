@@ -60,8 +60,8 @@ def getDataFromPosts(soup, fileName):
         repblock = postbody.find(class_="rep_bar")
         if repblock is None:
             rep = 0
-#            errorOutput.write("No reputation error in {0}! Message ID: {1}\n".format(fileName, postid))	fuck disabled rep
- #           errorOutput.flush()
+            errorOutput.write("No reputation error in {0}! Message ID: {1}\n".format(fileName, postid))
+            errorOutput.flush()
         else:
             rep = findAllTextInBlock(repblock).replace(' ', '')
 
@@ -143,7 +143,12 @@ def parsePages():
         fq = io.open('{0}/{1}.txt'.format(helpers.quotesDataLoc, sname), 'w+',encoding="UTF-8")
         
         text = f.read().replace('||','')
-        
+
+        text = text.replace("webkitallowfullscreen /",'')
+        #this beatiful hack sorta fixes broken soup's html parser, which breaks upon
+        #embedded youtube in OP. i dont know WHY, but without this slash (after webkitallowfullscreen
+        #which is just for locating) this shit utterly broken
+
         soup = BeautifulSoup(text, 'html.parser')
         data = getDataFromPosts(soup, file)
 
