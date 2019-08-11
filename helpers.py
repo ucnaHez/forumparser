@@ -26,7 +26,7 @@ cookiesDataLoc = "__private_key.txt"
 threadCount = 2
 topicCount = 18891
 usersCount = 7931 # :3
-startFrom = 10620
+startFrom = 18431
 
 errorText = "Извините, мы не можем найти это!"
 notExistsText = """<p class='ipsType_sectiontitle'>
@@ -39,11 +39,12 @@ userNotExists = """Вы запросили профиль несуществую
 userNotAvailable = """Этот пользователь больше не активен."""
 nginxError = "Sorry, the page you are looking for is currently unavailable."
 discordTitle = "Discord - Free voice and text chat for gamers"
+onyxDiscordTitle = "Check out the Chaotic Onyx community on Discord"
 
 cookies = {}
 
 def isDiscord(dat):
-    return discordTitle in dat
+    return discordTitle in dat or onyxDiscordTitle in dat
 
 def isErrorPage(dat):
     return errorText in dat or nginxError in dat or userNotExists in dat or userNotAvailable in dat
