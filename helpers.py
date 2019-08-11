@@ -26,6 +26,7 @@ cookiesDataLoc = "__private_key.txt"
 threadCount = 2
 topicCount = 18891
 usersCount = 7931 # :3
+startFrom = 10620
 
 errorText = "Извините, мы не можем найти это!"
 notExistsText = """<p class='ipsType_sectiontitle'>

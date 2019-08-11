@@ -108,7 +108,7 @@ def downloadDataAsync(method, args):
 #public members
 def downloadPages():
     topicsToDownload = []
-    for i in range(10345, helpers.topicCount + 1):
+    for i in range(helpers.startFrom, helpers.topicCount + 1):
         topicsToDownload.insert(0, (i, 1))
 
     downloadDataAsync(getMessagePagesAsync, topicsToDownload)
