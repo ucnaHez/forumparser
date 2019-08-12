@@ -104,6 +104,9 @@ def getDataFromUserpage(soup, fileName):
     data = []
     nickblock = soup.find(class_="nickname")
     nick = findAllTextInBlock(nickblock)
+
+    repblock = soup.find(class_="number")
+    rep = findAllTextInBlock(repblock)
     
     statblock = soup.find(class_="ipsList_data")
     rows = statblock.find_all(class_="row_data")
@@ -111,7 +114,7 @@ def getDataFromUserpage(soup, fileName):
     msgsCount =     findAllTextInBlock(rows[1])
     watchedTimes =  findAllTextInBlock(rows[2])
     
-    return (nick, group, msgsCount, watchedTimes)
+    return (nick, group, rep, msgsCount, watchedTimes)
 
 def parsePages():
     if not os.path.exists(helpers.processedDataLoc):
@@ -214,7 +217,7 @@ def parseUserpages():
         soup = BeautifulSoup(text, 'html.parser')
 
         data = getDataFromUserpage(soup, file)
-        fp.write('{0}||{1}||{2}||{3}||{4}\n'.format(data[0], sname, data[1], data[2], data[3]))        
+        fp.write('{0}||{1}||{2}||{3}||{4}||{5}\n'.format(data[0], sname, data[1], data[2], data[3], data[4]))
         fp.flush()
         
         f.close()
