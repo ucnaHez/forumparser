@@ -17,8 +17,8 @@ class WordCounter:
         self.unknownWordsCounter = Counter()
 
     def doWork(self):
-        print("Reading from: " + helpers.messagesDataLoc)
-        f = io.open(helpers.messagesDataLoc, 'r', encoding='UTF-8')
+        print("Reading from: " + helpers.allMessagesDataLoc)
+        f = io.open(helpers.allMessagesDataLoc, 'r', encoding='UTF-8')
         for text in f:
             msg = text.split('||')
             text = msg[6]
@@ -173,7 +173,9 @@ class TopicStartersCounter:
         f = io.open(helpers.allMessagesDataLoc, 'r', encoding="UTF-8")
         for text in f:
             msg = text.split('||')
-            if lastTopicID != msg[0]:
+            if lastTopicID != msg[0] and msg[1] == "000001":
+#                if msg[3] == "ucnaHez":
+#                    print(msg[0])
                 self.starterCounter[msg[3]] += 1
                 lastTopicID = msg[0]
         f.close()
@@ -215,12 +217,12 @@ class PublicMessagesCounter:
 
 def parseMessages():   
     analyzers = []
-    analyzers.append(MostLeastVotedContent())
+#    analyzers.append(MostLeastVotedContent())
     analyzers.append(TopicStartersCounter())
-    analyzers.append(CitationCounter())
-    analyzers.append(PublicMessagesCounter())
+#    analyzers.append(CitationCounter())
+#    analyzers.append(PublicMessagesCounter())
     #currently disabled due to long runtime
-    #analyzers.append(WordCounter())
+#    analyzers.append(WordCounter())
     
 
     for analyzer in analyzers:
