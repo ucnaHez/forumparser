@@ -190,6 +190,53 @@ class TopicStartersCounter:
             f.write(str(word[1]) + ":" + word[0] + "\n")
         f.close()
 
+class UserEfficencyCounter:
+    def __init__(self):
+        self.name = "Reputation efficency"
+        self.efficCounter = Counter()
+
+    def doWork(self):
+        print("Reading from: " + helpers.allUserdataDataLoc)
+        f = io.open(helpers.allUserdataDataLoc, 'r', encoding="UTF-8")
+        for text in f:
+            msg = text.split('||')
+            if int(msg[4]) >= 50:
+                self.efficCounter[msg[0]] = float(msg[3]) / float(msg[4])
+        f.close()
+
+    def finalize(self):
+        return
+
+    def saveData(self):
+        print("Writing to: " + helpers.repEfficencyDataLoc)
+        f = io.open(helpers.repEfficencyDataLoc, 'w+', encoding="UTF-8")
+        for word in self.efficCounter.most_common():
+            f.write("{:.4f}".format(word[1]) + ":" + word[0] + "\n")
+        f.close()
+
+class UserRepCounter:
+    def __init__(self):
+        self.name = "User reputation"
+        self.repCounter = Counter()
+
+    def doWork(self):
+        print("Reading from: " + helpers.allUserdataDataLoc)
+        f = io.open(helpers.allUserdataDataLoc, 'r', encoding="UTF-8")
+        for text in f:
+            msg = text.split('||')
+            self.repCounter[msg[0]] = int(msg[3])
+        f.close()
+
+    def finalize(self):
+        return
+
+    def saveData(self):
+        print("Writing to: " + helpers.userRepDataLoc)
+        f = io.open(helpers.userRepDataLoc, 'w+', encoding="UTF-8")
+        for word in self.repCounter.most_common():
+            f.write(str(word[1]) + ":" + word[0] + "\n")
+        f.close()
+
 #needs for other parsers
 class PublicMessagesCounter:
     def __init__(self):
@@ -217,10 +264,12 @@ class PublicMessagesCounter:
 
 def parseMessages():   
     analyzers = []
-#    analyzers.append(MostLeastVotedContent())
+    analyzers.append(MostLeastVotedContent())
     analyzers.append(TopicStartersCounter())
-#    analyzers.append(CitationCounter())
-#    analyzers.append(PublicMessagesCounter())
+    analyzers.append(CitationCounter())
+    analyzers.append(PublicMessagesCounter())
+    analyzers.append(UserRepCounter())
+    analyzers.append(UserEfficencyCounter())
     #currently disabled due to long runtime
 #    analyzers.append(WordCounter())
     
