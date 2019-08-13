@@ -22,11 +22,11 @@ def main():
  #   pageparser.parseUserpages()
 #    messageparser.parseMessages()
 
-    tdownloader.downloadPages()
+#    tdownloader.downloadPages()
 #    pageparser.parsePages()
-    tdownloader.downloadUserpages()
+#    tdownloader.downloadUserpages()
 #    pageparser.parseUserpages()
-#    messageparser.parseMessages()
+    messageparser.parseMessages()
     
 
 if __name__ == '__main__':

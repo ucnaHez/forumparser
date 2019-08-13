@@ -18,6 +18,7 @@ citationCountDataLoc =     processedDataLoc + "/citationCount.txt"
 ratedContentDataLoc =      processedDataLoc + "/ratedContent.txt"
 topicStartersDataLoc =     processedDataLoc + "/topicStarters.txt"
 msgsCountDataLoc =         processedDataLoc + "/publicMessagesCount.txt"
+msgsPerTopicDataLoc =      processedDataLoc + "/messagesPerTopicCount.txt"
 userRepDataLoc =           processedDataLoc + "/userRep.txt"
 repEfficencyDataLoc =      processedDataLoc + "/repEfficency.txt"
 

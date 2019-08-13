@@ -111,6 +111,29 @@ class CitationCounter:
             f.write(str(word[1]) + ":" + word[0] + "\n")
         f.close()
 
+class TopicMessagesCounter:
+    def __init__(self):
+        self.name = "Messages per topic"
+        self.msgtopics = Counter()
+
+    def doWork(self):
+        print("Reading from: " + helpers.allMessagesDataLoc)
+        f = io.open(helpers.allMessagesDataLoc, 'r', encoding="UTF-8")
+        for text in f:
+            msg = text.split('||')
+            self.msgtopics[msg[0]] += 1
+        f.close()
+
+    def finalize(self):
+        return
+
+    def saveData(self):
+        print("Writing to: " + helpers.msgsPerTopicDataLoc)
+        f = io.open(helpers.msgsPerTopicDataLoc, 'w+', encoding="UTF-8")
+        for word in self.msgtopics.most_common():
+            f.write(str(word[1]) + ": " + helpers.getPageURL(word[0]) + "\n")
+        f.close()
+
 class MostLeastVotedContent:
     def __init__(self):
         self.name = "Most and least rated content"
@@ -270,6 +293,7 @@ def parseMessages():
     analyzers.append(PublicMessagesCounter())
     analyzers.append(UserRepCounter())
     analyzers.append(UserEfficencyCounter())
+    analyzers.append(TopicMessagesCounter())
     #currently disabled due to long runtime
 #    analyzers.append(WordCounter())
     
